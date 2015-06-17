@@ -1,5 +1,8 @@
 # TinyAstro
 Scripts to build TinyAstro image. 
+TinyAstro is a ARM Linux system with Kstars and INDI libs.
+With your mobile phone or tablet, you can control your gears
+without a computer.
 
 ## Support device 
 

@@ -749,7 +749,7 @@ if [ "${BOARD}" = "C1" ] ; then
 fi
 
 if [ "${BOARD}" = "C1" ] ; then
-    cp -r mali_ddx $odir/usr/local/bin
+    cp -r odroid/mali_ddx $odir/usr/local/bin
     # Copy boot files
     if [ ! "${_boot_on_ext4}" = "yes" ] ; then
         mv $odir/media/boot/* $bootdir

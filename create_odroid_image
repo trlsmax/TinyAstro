@@ -628,8 +628,13 @@ max_num_sta=8
 
 _EOF_
 
-echo "interface=wlan0" >> /etc/dnsmasq.conf
-echo "dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h" >> /etc/dnsmasq.conf
+cat >> $odir/etc/dnsmasq.conf << _EOF_
+
+interface=wlan0
+dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h
+
+_EOF_
+
 }
 
 

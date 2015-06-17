@@ -35,5 +35,15 @@ sudo ./create_rk_image
 sudo ./create_odroid_image
 ```
 
+## Usage
+
+user name : `astro`
+passwork: `astronomy`
+
+use vncviewer to connect port 5900 and you will get a desktop
+
+If you use WIFI AP, there will be a AP SSID like `TinyAstro_xxxxxx`
+connect it with passwork `astronomy`.
+
 ** These scripts is base on loboris's
 "Ubuntu & Debian debootstrap instalation" scripts from [forum of odroid](http://forum.odroid.com/viewtopic.php?f=112&t=8075) **

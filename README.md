@@ -7,7 +7,7 @@ without a computer.
 ## Support device 
 
 * RK3188 + AP6210(internal WIFI as AP)
-* Odroid C1 + RTL8192CU(usb WIFI as AP)
+* Odroid C1 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)
 
 ## Require
 

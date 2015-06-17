@@ -1,0 +1,123 @@
+html, body
+{
+    margin: 0;
+    padding: 0;
+}
+body
+{
+    font: 12px/1.3em Arial, Helvetica, sans-serif;
+    color: #f00;
+    background-color: #000;
+}
+h1, h2, h3, h4, h5
+{
+    margin: 0 0 1em;
+    color: #F2683E;
+}
+h1
+{
+    font-size: 18px;
+    font-weight: normal;
+}
+h2
+{
+    font-size: 25px;
+    //font-weight: normal;
+}
+p{margin: 0 0 1em;}
+a,
+a:link,
+a:visited{color: #F2683E;}
+a:hover,
+a:active{}
+a img{border: none;}
+form{margin: 0;}
+fieldset{padding: 0;}
+hr
+{
+    height: 1px;
+    border: none;
+    color: #999;
+    background-color: #999;
+}
+
+/* ~~~ === POSITIONG SELECTORS ======================================= ~~~ */
+#wrapper
+{
+    position: relative;
+    width: 80%;
+    //height: 474px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#content
+{
+    //float: left;
+    display: inline;
+    //width: 700px;
+    //height: 341px;
+    margin: 30px 0 0 8px;
+    padding: 22px;
+    text-align: center;
+}
+
+//#fileToUpload {text-align:center; width:300px;height:300px;background:#f00;}
+#reboot {
+	text-align:center; 
+	margin: 20px; 
+	font-size: 700%; 
+	width:300px;
+	height:300px;
+	background:#f00;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	border-radius: 20px;
+}
+#halt {
+	text-align:center; 
+	margin: 20px; 
+	font-size: 700%; 
+	width:300px;
+	height:300px;
+	background:#f00;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-khtml-border-radius: 20px;
+	border-radius: 20px;
+}
+
+div.fileinputs {
+	position: relative;
+	width: 300px;
+	height: 300px;
+	background: #f00;
+	margin: auto;
+     -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
+
+
+div.fakefile {
+	position: absolute;
+	top: 45%;
+	left: 10%;
+	color: #000;
+	font-size: 600%;
+	z-index: 1;
+}
+
+input.file {
+	position: relative;
+	text-align: right;
+	-moz-opacity:0 ;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+	z-index: 2;
+	display: block;
+	width: 300px;
+	height: 300px;
+}

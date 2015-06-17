@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# Last update: 2015-03-12
+# *****************************************************
+# !! REMEMBER TO SET PARAMETERS IN FILE "second-stage *
+# *****************************************************
+
+if [ "$(id -u)" != "0" ]; then
+   echo "Script must be run as root !"
+   exit 0
+fi
+
+echo ""
+date
+echo "Creating TinyAstro Ubuntu/Debian image for Odroid board"
+echo "========================================================"
+echo ""
+
+_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $_DIR
+
+# =====================================================
+# ==== P A R A M E T E R S ============================
+# =====================================================
+
+# ========= size of the system.img ========
+image_size=2048
+
+# ========= image name ==================
+image_name=system.img
+
+# ========== tmp dir ================
+image_tmp=system_img_tmp
+
+image_label=linuxroot
+
+rfs=./rfs
+
+rm -f $image_name > /dev/null 2>&1
+rm -rf $image_tmp > /dev/null 2>&1
+
+if [ $image_size -eq 0 ]; then
+    image_size=2048
+fi
+
+echo "Creating system.img image, please wait ..."
+echo ""
+dd if=/dev/zero of=$image_name bs=1M count=$image_size #> /dev/null 2>&1
+
+echo ""
+echo "Creating new filesystem on $image_name ..."
+mkfs -F -t ext4 -L $image_label $image_name #> /dev/null 2>&1
+
+mkdir $image_tmp
+
+mount -o loop $image_name $image_tmp
+
+if [ ! -d ./rfs ] ; then
+    echo "No rfs found, please create rfs first."
+    exit 0
+fi
+
+echo "Copy rootfs from $rfs to $image_tmp ......"
+rsync -rtpogxlHds --delete --numeric-ids --stats $rfs/* $image_tmp/
+echo "done."
+echo ""
+
+cp ./rk/cfg/ap* $image_tmp/etc/hostapd/
+cp ./rk/cfg/dnsmasq.conf $image_tmp/etc/
+cp ./rk/cfg/interfaces $image_tmp/etc/network/
+#cp ./rk/cfg/wpa_supplicant.conf $image_tmp/etc/wpa_supplicant/
+cp ./rk/cfg/modules $image_tmp/etc/
+cp ./rk/cfg/rc.local $image_tmp/etc/
+cp ./rk/cfg/fstab $image_tmp/etc/
+cp ./rk/modules.tar.bz2 $image_tmp
+
+cp chroot_script_rk $image_tmp/bin/
+chroot $image_tmp /bin/bash /bin/chroot_script_rk
+rm $image_tmp/bin/chroot_script_rk
+
+umount $image_tmp
+rm -rf $image_tmp
+mv $image_name ./rk/img/
+
+echo "start to build the image"
+
+rm -f ./tmp.img ./update.img ./tinyastro.7z
+./rk/afptool -pack ./rk/img ./tmp.img
+./rk/img_maker ./rk/img/RK3188Loader\(L\)_V2.10.bin ./tmp.img ./update.img
+
+rm -rf $image_tmp ./tmp.img
+#tar cJvf ./tinyastro.tar.xz ./update.img ./README ./RKBatchTool-v1.8.rar ./upgrade_tool

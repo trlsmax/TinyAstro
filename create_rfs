@@ -1,0 +1,219 @@
+#!/bin/bash
+
+# Last update: 2015-03-12
+# *****************************************************
+# !! REMEMBER TO SET PARAMETERS IN FILE "second-stage *
+# *****************************************************
+
+if [ "$(id -u)" != "0" ]; then
+   echo "Script must be run as root !"
+   exit 0
+fi
+
+echo ""
+date
+echo "Creating TinyAstro root file system"
+echo "========================================================"
+echo ""
+
+_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $_DIR
+
+# =====================================================
+# ==== P A R A M E T E R S ============================
+# =====================================================
+
+# *****************************************************
+# Select ubuntu/debian distribution and repository    *
+# SELECT ONLY ONE distro AND ONE repo                 *
+# *****************************************************
+
+# === Ubuntu ===
+#distro="precise"
+#distro="trusty"
+#distro="utopic"
+distro="vivid"
+#repo="http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/"
+#repo="http://ftp.ubuntu-tw.org/mirror/ubuntu-ports/"
+repo="http://mirrors.ustc.edu.cn/ubuntu-ports"
+#repo="http://mirrors.ustc.edu.cn/ubuntu"
+#repo="http://ports.ubuntu.com/ubuntu-ports"
+
+# === Debian ===
+#distro="wheezy"
+#distro="jessie"
+#repo="http://ftp.us.debian.org/debian"
+
+# === output dir ===
+odir="./rfs"
+
+# === ARCH ===
+#arch=amd64
+arch=armhf
+
+if [ "${arch}" = "armhf" ] ; then
+_chroot_opt="/usr/bin/qemu-arm-static -cpu cortex-a9"
+else
+_chroot_opt=
+fi
+
+# ============================================
+if [ "${distro}" = "" ]; then
+    echo "Distribution must be specified."
+    exit 0
+fi
+if [ "${repo}" = "" ]; then
+    echo "Repository must be specified."
+    exit 0
+fi
+# ============================================
+
+_excode=0
+
+# **** show progress *******
+proc_wait() {
+    spin='-\|/'
+
+    i=0
+    while kill -0 $1 2>/dev/null
+    do
+      i=$(( (i+1) %4 ))
+      printf "\r$2 ${spin:$i:1}"
+      sleep .1
+    done
+    _excode=$?
+
+    if [ $_excode -eq 0 ]
+    then
+      printf "\rOK.                        \n"
+    else
+      printf "\rERROR.                     \n"
+    fi
+}
+# **************************
+
+#===================================================================================================================
+# =========================
+# DEBOOTSTRAP UBUNTU DISTRO
+# =========================
+echo ""
+
+# ====== remove old rfs =======
+#if [ -d $odir ] ; then
+#    rm -rf $odir
+#fi
+
+echo "DEBOOTSTRAP, FIRST STAGE"
+debootstrap --arch $arch --foreign --verbose --variant=minbase --include=wget $distro $odir $repo #> /dev/null 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+#if [ $_excode -ne 0 ]; then
+#    echo "ERROR IN DEBOOTSTRAP!"
+#    exit 0
+#fi
+
+# ***************************
+# ** CREATE NEW sources.list:
+# ***************************
+echo "Creating \"sources.list\""
+case ${distro} in trusty|utopic|precise|vivid)
+cat > $odir/sources.list << _EOF_
+deb $repo/ $distro main restricted universe multiverse
+deb-src $repo/ $distro main restricted universe multiverse
+deb $repo/ $distro-updates main restricted universe multiverse
+deb-src $repo/ $distro-updates main restricted universe multiverse
+deb $repo/ $distro-security main restricted universe multiverse
+deb $repo/ $distro-backports main restricted universe multiverse
+_EOF_
+;;*)
+cat > $odir/sources.list << _EOF_
+deb $repo/ $distro main contrib non-free
+deb-src $repo/ $distro main contrib non-free
+
+deb $repo/ $distro-updates main contrib non-free
+deb-src $repo/ $distro-updates main contrib non-free
+
+deb $repo/ $distro-backports main contrib non-free
+deb-src $repo/ $distro-backports main contrib non-free
+_EOF_
+;;esac
+
+if [ "${distro}" = "utopic" ] ; then
+    # kodi from hardkernel repository needs some lib's from trusty !!!
+    echo "deb $repo/ trusty main universe" #>> $odir/sources.list
+fi
+
+# make necessary directories and copy some files
+mkdir -p $odir/etc/default > /dev/null 2>&1
+mkdir -p $odir/usr/local/bin
+
+cp /etc/timezone $odir/etc
+cp /usr/bin/qemu-arm-static $odir/usr/bin
+cp second-stage $odir/second-stage
+#cp wallpaper.png $odir/ #> /dev/null 2>&1
+
+echo "Copy config file to rootfs ..."
+echo ""
+cp ./common/cfg/tinyastro $odir/etc/
+cp -rf ./common/www $odir/var/
+
+echo "Copy tools ..."
+echo ""
+cp -rf ./common/tools $odir/home/
+cp -rf ./common/desktop $odir/home/
+cp ./common/cfg/gtkrc-2.0 $odir/home/
+cp ./common/cfg/kdeglobals $odir/home/
+cp ./common/cfg/xinitrc $odir/home/
+cp ./common/cfg/kstarsrc $odir/home/
+cp ./common/*.deb $odir
+
+#======================================================================================
+if ! chroot $odir $_chroot_opt /bin/bash /second-stage; then
+    mv $odir/install.log . > /dev/null 2>&1
+    echo "================================================"
+    echo "ERROR on second-stage, instalation NOT FINISHED."
+    echo "================================================"
+    exit 1
+fi
+
+if [ ! -f $odir/_OK_ ]; then
+    mv $odir/install.log . > /dev/null 2>&1
+    echo "================================================"
+    echo "ERROR on second-stage, instalation NOT FINISHED."
+    echo "================================================"
+    exit 1
+fi
+#======================================================================================
+
+cp ./common/cfg/sudoers $odir/etc/
+cp -rf "./common/cfg/Mona 1.0" $odir/usr/share/themes/
+cp ./common/cfg/xorg.dummy.conf $odir/etc/X11/
+cp ./common/cfg/Xwrapper.config $odir/etc/X11/
+
+# hostapd for rtl8192cu
+cp ./common/hostapd $odir/usr/sbin/hostapd_rtl
+
+#echo "Copy astrometry.net index ..."
+#echo ""
+#cp ./common/idx/* $odir/usr/share/data/
+#echo "Done."
+
+rm $odir/_OK_ > /dev/null 2>&1
+rm $odir/second-stage > /dev/null 2>&1
+mv $odir/install.log ./install-${distro}.log > /dev/null 2>&1
+
+# Copy scripts
+#cp fs_resize $odir/usr/local/bin
+#cp install_desktop $odir/usr/local/bin
+#cp install_mini_desktop $odir/usr/local/bin
+
+sync
+
+rm -rf $odir/dev/*
+rm -rf $odir/proc/*
+rm -rf $odir/run/*
+rm -rf $odir/sys/*
+rm -rf $odir/tmp/*
+
+echo ""
+

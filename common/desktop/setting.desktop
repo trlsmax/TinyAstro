@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Setting
+Categories=Utility;
+Exec=/home/astro/tools/control
+Icon=gnome-settings
+StartupNotify=true
+Type=Application
+Terminal=false
+MimeType=inode/directory;inode/mount-point;x-scheme-handler/ssh;x-scheme-handler/smb;x-scheme-handler/nfs;x-scheme-handler/ftp;
+GenericName=Setting
+Comment=Setting
+Keywords=Setting;

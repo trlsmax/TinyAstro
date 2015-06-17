@@ -1,0 +1,26 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+
+# === install Hardkernel's packages ======
+echo "Installing kernel..."
+touch /boot/uImage 
+mkdir -p /tmp/btini
+apt-get update 
+
+# install upstart-sysv
+apt-get -y -q install upstart-sysv
+
+apt-get -y -q download bootini 
+dpkg-deb -x *.deb /tmp/btini/
+cp -r -v /tmp/btini/etc/* /etc
+mv /etc/initramfs-tools/scripts/local-top/c1_init.sh /usr/local/bin/
+rm -rf /tmp/btini
+rm -rf *.deb
+
+apt-get -y -q install linux-image-c1 mali-fbdev 
+apt-get clean
+# =======================================
+
+chmod +x /usr/sbin/hostapd_rtl
+

@@ -1,0 +1,1254 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR 2013 JP & C Software
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenSkyImager 0.7.3\n"
+"Report-Msgid-Bugs-To: gspezzano@gmail.com\n"
+"POT-Creation-Date: 2014-01-19 16:42+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../imgAvi.c:176
+#, c-format
+msgctxt "avi"
+msgid "Unable to write file %s. Check permissions"
+msgstr "Impossibile scrivere il file %s. Controllare i pemessi"
+
+#: ../imgAvi.c:180
+#, c-format
+msgctxt "avi"
+msgid "A component of the file path %s is not a folder"
+msgstr "Una parte del percorso %s non è una cartella"
+
+#: ../imgAvi.c:186
+#, c-format
+msgctxt "avi"
+msgid "A component of the file path %s could not be created, check permissions"
+msgstr "Una parte del percorso %s non può essere creata. Controllare i permessi"
+
+#: ../imgCFWio.c:142 ../imgCFWio.c:236
+msgctxt "cfw"
+msgid "Camera is not connected"
+msgstr "Camera non connessa"
+
+#: ../imgCFWio.c:146 ../imgCFWio.c:240
+msgctxt "cfw"
+msgid "Camera does not support direct CFW connection"
+msgstr "Il modello non supporta la connessione diretta della ruota porta filtri"
+
+#: ../imgCFWio.c:172
+msgctxt "cfw"
+msgid "Serial port does not exist"
+msgstr "La porta seriale non esiste"
+
+#. / This will complete: "Filter wheel connected to %s"
+#: ../imgCFWio.c:191
+msgctxt "cfw"
+msgid "camera"
+msgstr "camera"
+
+#: ../imgCFWio.c:221
+#, c-format
+msgctxt "cfw"
+msgid "Could not connect to CFW on serial port %s, error: %s"
+msgstr "Impossibile connettersi alla ruota porta filtri sulla porta %s, errore: %s"
+
+#: ../imgCFWio.c:271
+#, c-format
+msgctxt "cfw"
+msgid "Could not disconnect from CFW on serial port %s, error: %s"
+msgstr "Impossible disconnettersi dalla ruota porta filtri sulla porta %s, errore %s"
+
+#. / Model name
+#: ../imgCFWio.c:311
+msgctxt "cfw"
+msgid "5-QHY 5 slots 2\""
+msgstr "5-QHT 5 posti 2\""
+
+#: ../imgCFWio.c:312
+msgctxt "cfw"
+msgid "|5-QHY 5 slots 2\""
+msgstr "|5-QHY 5 posti 2\""
+
+#. / Model name
+#: ../imgCFWio.c:323
+msgctxt "cfw"
+msgid "8-QHY serial"
+msgstr "8-QHY seriale"
+
+#: ../imgCFWio.c:324
+msgctxt "cfw"
+msgid "|8-QHY serial"
+msgstr "|8-QHY seriale"
+
+#: ../imgCFWio.c:343
+#, c-format
+msgctxt "cfw"
+msgid "Could not read from CFW on serial port %s, error: %s"
+msgstr "Ricezione dati fallita dalla ruota porta filtri sulla porta %s, errore: %s"
+
+#: ../imgCFWio.c:350 ../imgCFWio.c:378 ../imgCFWio.c:379 ../imgCFWio.c:448
+#, c-format
+msgctxt "cfw"
+msgid "Could not write to CFW on serial port %s, error: %s"
+msgstr "Invio dati alla ruota porta filtri sulla porta %s fallito, errore: %s"
+
+#: ../imgCFWio.c:431 ../imgCFWio.c:463
+#, c-format
+msgctxt "cfw"
+msgid "Filter wheel moving to slot: %d"
+msgstr "Ruota in movimento verso la posizione: %d"
+
+#: ../imgCFWio.c:440
+msgctxt "cfw"
+msgid "Could not start notification thread, btw slot selection command was sent ok."
+msgstr "Impossibile avviare il tread di lettura delle notifiche, il comando è però stato inviato correttamente."
+
+#: ../imgCFWio.c:453
+#, c-format
+msgctxt "cfw"
+msgid "Requested slot (%d) does not exist. Slots = %d"
+msgstr "La posizionee richiesta (%d) non esiste. Posizioni = %d"
+
+#. / Value "No cam" of the models combo
+#: ../imgCamio.c:155 ../imgCamio.c:287 ../imgWindow.c:1428
+msgctxt "camio"
+msgid "None"
+msgstr "----"
+
+#: ../imgCamio.c:454
+msgctxt "camio"
+msgid "Camera reset script complete"
+msgstr "Script di reset della camera completato"
+
+#: ../imgCamio.c:464
+msgctxt "camio"
+msgid "Reset for this camera model is unsupported"
+msgstr "La funzione di reset per questo modello non supportata"
+
+#: ../imgFitsio.c:207
+msgctxt "fitsio"
+msgid "Fit read only works on 2 axes images"
+msgstr "Lettura fit supportata solo per immagini a 2 assi"
+
+#: ../imgFitsio.c:215 ../imgFitsio.c:301
+#, c-format
+msgctxt "fitsio"
+msgid "cfitsio error: %d"
+msgstr "Errore cfitsio: %d"
+
+#: ../imgFitsio.c:308
+#, c-format
+msgctxt "fitsio"
+msgid "A component of the file path %s could not be created, check permissions"
+msgstr "Una parte del percorso %s non può essere creata. Controlla i permessi"
+
+#: ../imgPixbuf.c:242 ../imgPixbuf.c:443
+msgctxt "pixbuf"
+msgid "Only works with 8/16bpp images"
+msgstr "Funziona solo per immagini da 8/16bpp"
+
+#. / Message on statusbar about last saved frame (%s)
+#: ../imgWCallbacks.c:158 ../imgWCallbacks.c:242
+#, c-format
+msgctxt "main"
+msgid "Image: %s saved"
+msgstr "Immagine: %s salvata"
+
+#. / Message on statusbar about last frame add to avi (%s)
+#: ../imgWCallbacks.c:163 ../imgWCallbacks.c:247
+#, c-format
+msgctxt "main"
+msgid "Frame: add to %s"
+msgstr "Frame aggiunto a %s"
+
+#. / Message on statusbar about last saved frame (%s) + last frame add to avi (%s)
+#: ../imgWCallbacks.c:168 ../imgWCallbacks.c:252
+#, c-format
+msgctxt "main"
+msgid "Image: %s saved, Frame: add to %s"
+msgstr "Immagine salvata: %s, Frame aggiunto a %s"
+
+#: ../imgWCallbacks.c:220
+msgctxt "main"
+msgid "Error starting capture thread"
+msgstr "Errore di avvio thread di acquisizione"
+
+#: ../imgWCallbacks.c:255
+msgctxt "main"
+msgid "capture end"
+msgstr "fine acquisizione"
+
+#. / Message to confirm end of capture thread in focus mode
+#: ../imgWCallbacks.c:264
+msgctxt "main"
+msgid "Focus end"
+msgstr "Fine fuoco/anteprima"
+
+#. / Statusbar feedback message about tec power
+#: ../imgWCallbacks.c:305
+#, c-format
+msgctxt "main"
+msgid "Tec power set to: %d%%"
+msgstr "Potenza tec al: %d%%"
+
+#. / Statusbar feedback message about cooling status in automatic mode
+#: ../imgWCallbacks.c:468
+#, c-format
+msgctxt "main"
+msgid "Tec: %+06.2FC, Target: %+06.2FC, Power: %d%%"
+msgstr "Tec: %+06.2FC, Richiesta: %+06.2FC, Potenza: %d%%"
+
+#. / Satusbar feedback message about cooling in manual mode
+#: ../imgWCallbacks.c:473
+#, c-format
+msgctxt "main"
+msgid "Tec: %+06.2fC, Power: %d%%"
+msgstr "Tec: %+06.2fC, Potenza: %d%%"
+
+#: ../imgWCallbacks.c:489
+msgctxt "main"
+msgid "Error communicating with tec"
+msgstr "Errore di comunicazione con il raffreddamento"
+#. / Satusbar feedback message about temperature only
+#: ../imgWCallbacks.c:508
+#, c-format
+msgctxt "main"
+msgid "Temp: %+06.2fC"
+msgstr "Temp.: %+06.2fC"
+
+#. / Starusbar feedback message about timelapse mode
+#: ../imgWCallbacks.c:537
+#, c-format
+msgctxt "main"
+msgid "TimeLapse mode full, start at: %s, end at: %s, interval: %d seconds"
+msgstr "Modo 'timelapse' avanzato, inizio: %s, fine: %s, secondi di intervallo: %d"
+
+#: ../imgWCallbacks.c:541
+#, c-format
+msgctxt "main"
+msgid "TimeLapse mode simple, interval: %d seconds"
+msgstr "Modo 'timelapse' normale, secondi di intervallo %d"
+
+#: ../imgWCallbacks.c:546
+msgctxt "main"
+msgid "TimeLapse mode finished"
+msgstr "Modo 'timelapse' terminato"
+
+#: ../imgWCallbacks.c:595
+msgctxt "main"
+msgid "Hide settings"
+msgstr "Chiudi parametri"
+
+#: ../imgWCallbacks.c:599 ../imgWindow.c:52
+msgctxt "main"
+msgid "Show settings"
+msgstr "Apri parametri"
+
+#: ../imgWCallbacks.c:612
+msgctxt "about"
+msgid "OpenSkyImager is a capture program written for Astronomy camera operation"
+msgstr "OpenSkyImager è un programma per l'utilizzo di telecamere da Astronomia"
+
+#: ../imgWCallbacks.c:613
+msgctxt "about"
+msgid ""
+"Copyright (c) 2013 JP & C AstroSoftware\n"
+"\n"
+"Licensed under GNU GPL 3.0\n"
+"\n"
+"This program is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 3 of the License, or\n"
+"any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see <http://www.gnu.org/licenses/>."
+msgstr ""
+"Copyright (c) 2013 JP & C AstroSoftware,\n"
+"\n"
+"Rilasciato con licenza GNU GPL 3.0\n"
+"\n"
+"Questo programma è software gratuito: può essere distribuito e modificato\n"
+"a termini di licenza 'GNU General Public License' come pubblicato dalla\n"
+"'the Free Software Foundation', versione 3 della licenza, oppure\n"
+"versioni successive.\n"
+"\n"
+"Questo programma è dstribuito sperando che sia utile,\n"
+"ma SENZA ALCUNA GARANZIA; esclusa anche la garanzia implicita di\n"
+"COMMERCIABILITA' o ADATTABILITA' AD UN USO SPECIFICO.\n"
+"Per maggiori dettagli consultare la 'GNU General Public License'.\n"
+"\n"
+"Insieme al programma si dovrebbe ricevere una copia della 'GNU General "
+"Public License'.\n"
+"In caso contrario, consultare <http://www.gnu.org/licenses/>."
+
+#: ../imgWCallbacks.c:617
+msgctxt "about"
+msgid "OpenSkyImager website"
+msgstr "Sito web OpenSkyImager"
+
+#: ../imgWCallbacks.c:722
+msgctxt "main"
+msgid "Folder or base name not set!"
+msgstr "Cartella o nome immagine non impostati"
+
+#: ../imgWCallbacks.c:822
+msgctxt "main"
+msgid "Read from camera thread failed to start"
+msgstr "Non è stato possibile avviare il thread di acquisizione"
+
+#: ../imgWCallbacks.c:843
+msgctxt "main"
+msgid "Capture start"
+msgstr "Acquisizione immagini avviata"
+
+#: ../imgWCallbacks.c:847
+msgctxt "main"
+msgid "Focus start"
+msgstr "Fuoco/anteprima avviata"
+
+#: ../imgWCallbacks.c:867 ../imgWCallbacks.c:918 ../imgWCallbacks.c:928
+#: ../imgWCallbacks.c:940 ../imgWCallbacks.c:960 ../imgWindow.c:188
+msgctxt "main"
+msgid "Start"
+msgstr "Avvia"
+
+#: ../imgWCallbacks.c:873 ../imgWCallbacks.c:920
+msgctxt "main"
+msgid "Running exposure aborted"
+msgstr "Acquisizione in corso interrotta"
+
+#: ../imgWCallbacks.c:880
+msgctxt "main"
+msgid "Abort capture failed or not supported, please wait end of current exposure"
+msgstr "Interruzione acquisizione non supportata, attendere il completamento "
+"dell'immagine corrente"
+
+#. / Start / Stop / Kill button state message
+#: ../imgWCallbacks.c:893 ../imgWCallbacks.c:951
+msgctxt "main"
+msgid "Kill"
+msgstr "Interrompi"
+
+#: ../imgWCallbacks.c:906
+msgctxt "main"
+msgid "Wait last capture end"
+msgstr "Attendere il completamento dell'ultima immagine"
+
+#: ../imgWCallbacks.c:955
+msgctxt "main"
+msgid "Stop"
+msgstr "Ferma"
+
+#. / Hold / Resume status message
+#: ../imgWCallbacks.c:974
+msgctxt "main"
+msgid "Resume"
+msgstr "Riprendi"
+
+#: ../imgWCallbacks.c:977
+msgctxt "main"
+msgid "Capture hold"
+msgstr "Acquisizione in pausa"
+
+#: ../imgWCallbacks.c:981
+msgctxt "main"
+msgid "Focus hold"
+msgstr "Fuoco/anteprima in pausa"
+
+#. / Hold resume status message
+#: ../imgWCallbacks.c:987 ../imgWindow.c:217
+msgctxt "main"
+msgid "Hold"
+msgstr "Pausa"
+
+#: ../imgWCallbacks.c:990
+msgctxt "main"
+msgid "Capture resume"
+msgstr "Acquisizione ripresa"
+
+#: ../imgWCallbacks.c:994
+msgctxt "main"
+msgid "Focus resume"
+msgstr "Fuoco/anteprima ripresa"
+
+#. / 1:1 / Fit status message
+#: ../imgWCallbacks.c:1004
+msgctxt "main"
+msgid "Fit"
+msgstr "Adatta"
+
+#: ../imgWCallbacks.c:1006
+msgctxt "main"
+msgid "Fit to screen"
+msgstr "Adatta allo schermo"
+
+#: ../imgWCallbacks.c:1010 ../imgWindow.c:238
+msgctxt "main"
+msgid "1:1"
+msgstr "1:1"
+
+#: ../imgWCallbacks.c:1012
+msgctxt "main"
+msgid "Original size"
+msgstr "Dimensione originale"
+
+#: ../imgWCallbacks.c:1022
+msgctxt "main"
+msgid "Hide graph"
+msgstr "Icona"
+
+#: ../imgWCallbacks.c:1024
+msgctxt "main"
+msgid "Show graph image"
+msgstr "Mostra grafico dell'immagine"
+
+#: ../imgWCallbacks.c:1029 ../imgWindow.c:313
+msgctxt "main"
+msgid "Show graph"
+msgstr "Grafico"
+
+#: ../imgWCallbacks.c:1031
+msgctxt "main"
+msgid "Show preview thumbnail"
+msgstr "Mostra icona dell'immagine"
+
+#: ../imgWCallbacks.c:1245
+msgctxt "quit-message"
+msgid "Confirm exit"
+msgstr "Conferma uscita"
+
+#: ../imgWCallbacks.c:1246
+msgctxt "quit-message"
+msgid "Do you really want to quit?"
+msgstr "Vuoi veramente uscire?"
+
+#: ../imgWCallbacks.c:1276
+#, c-format
+msgctxt "main"
+msgid "Debayer strategy set to: %s"
+msgstr "Maschera debayer: %s"
+
+#: ../imgWCallbacks.c:1299
+#, c-format
+msgctxt "main"
+msgid "Exposure time set to: %s"
+msgstr "Tempo di esposizione: %s"
+
+#: ../imgWCallbacks.c:1343
+#, c-format
+msgctxt "main"
+msgid "Camera %s selected"
+msgstr "Camera selezionata: %s"
+
+#: ../imgWCallbacks.c:1407 ../imgWindow.c:440
+msgctxt "settings"
+msgid "Connect"
+msgstr "Connetti"
+
+#: ../imgWCallbacks.c:1408
+#, c-format
+msgctxt "main"
+msgid "Camera %s disconnected"
+msgstr "Camera %s disconnessa"
+
+#: ../imgWCallbacks.c:1476
+msgctxt "settings"
+msgid "Disconnect"
+msgstr "Disconnetti"
+
+#: ../imgWCallbacks.c:1478
+#, c-format
+msgctxt "main"
+msgid "Camera %s connected"
+msgstr "Camera connessa: %s"
+
+#: ../imgWCallbacks.c:1490
+msgctxt "cfw"
+msgid "99-In camera"
+msgstr "99-In camera"
+
+#: ../imgWCallbacks.c:1516
+msgctxt "main"
+msgid "Full camera list set"
+msgstr "Selezionalta lista completa dei modelli"
+
+#: ../imgWCallbacks.c:1520
+msgctxt "main"
+msgid "Active camera list set"
+msgstr "Selezionata lista dei modelli attivi"
+
+#: ../imgWCallbacks.c:1542
+#, c-format
+msgctxt "main"
+msgid "Gain set to: %d"
+msgstr "Guadagno: %d"
+
+#: ../imgWCallbacks.c:1554
+#, c-format
+msgctxt "main"
+msgid "Offset set to: %d"
+msgstr "Offset: %d"
+
+#: ../imgWCallbacks.c:1574
+#, c-format
+msgctxt "main"
+msgid "Binning mode set to: %dx%d"
+msgstr "Modo binning: %dx%d"
+
+#: ../imgWCallbacks.c:1593
+#, c-format
+msgctxt "main"
+msgid "Capture size set to: %dx%d"
+msgstr "Dimensione frame: %dx%d"
+
+#: ../imgWCallbacks.c:1599
+msgctxt "main"
+msgid "Capture size set to: Full frame"
+msgstr "Dimensione frame: completo"
+
+#: ../imgWCallbacks.c:1637
+#, c-format
+msgctxt "main"
+msgid "Download speed set to: %s"
+msgstr "Velocità trasferimento: %s"
+
+#. / This can be "Capture mode set to...  or Usb Speed set to...
+#. / Content of the first part is translated separately
+#: ../imgWCallbacks.c:1669
+#, c-format
+msgctxt "main"
+msgid "%s set to: %s"
+msgstr "%s: %s"
+
+#: ../imgWCallbacks.c:1695
+#, c-format
+msgctxt "main"
+msgid "Amp control set to: %s"
+msgstr "Controllo amplificatore: %s"
+
+#: ../imgWCallbacks.c:1720
+#, c-format
+msgctxt "main"
+msgid "Noise reduction set to: %s"
+msgstr "Riduzione rumore: %s"
+
+#: ../imgWCallbacks.c:1745
+#, c-format
+msgctxt "main"
+msgid "Image depth set to: %s"
+msgstr "Profondità immagine: %s"
+
+#: ../imgWCallbacks.c:1775 ../imgWCallbacks.c:2070 ../imgWCallbacks.c:2077
+#, c-format
+msgctxt "main"
+msgid "Base folder/file set: %s%s"
+msgstr "Cartella/nome immagine %s%s"
+
+#: ../imgWCallbacks.c:1811
+msgctxt "main"
+msgid "Audela naming convention selected"
+msgstr "Selezionata nomenclatura 'Audela'"
+
+#: ../imgWCallbacks.c:1819
+msgctxt "main"
+msgid "Audela naming convention removed"
+msgstr "Deselezionata nomencaltura 'Audela'"
+
+#: ../imgWCallbacks.c:1828
+msgctxt "main"
+msgid "Iris naming convention selected"
+msgstr "Selezionata nomenclatura 'Iris'"
+
+#: ../imgWCallbacks.c:1832
+msgctxt "main"
+msgid "Iris naming convention removed"
+msgstr "Deselezionata nomenclatura 'Iris'"
+
+#: ../imgWCallbacks.c:1841
+msgctxt "main"
+msgid "Frame counter will be reset each new start"
+msgstr "Il contatore delle immagini sarà resettato ad ogni avvio acquisizione"
+
+#: ../imgWCallbacks.c:1845
+msgctxt "main"
+msgid "Frame counter absolute"
+msgstr "Contatore immagini assoluto"
+
+#: ../imgWCallbacks.c:1862
+msgctxt "main"
+msgid "Time lapse mode enabled"
+msgstr "Modo 'timelapse' abilitato"
+
+#: ../imgWCallbacks.c:1867
+msgctxt "main"
+msgid "Time lapse mode disabled"
+msgstr "Modo 'timelapse' disabilitato"
+
+#: ../imgWCallbacks.c:1896 ../imgWCallbacks.c:1910 ../imgWCallbacks.c:1924
+#: ../imgWCallbacks.c:2029
+#, c-format
+msgctxt "main"
+msgid "Time lapse date start set to: %s"
+msgstr "Inizio 'timelapse': %s"
+
+#: ../imgWCallbacks.c:1938 ../imgWCallbacks.c:1952 ../imgWCallbacks.c:1966
+#: ../imgWCallbacks.c:2039
+#, c-format
+msgctxt "main"
+msgid "Time lapse date end set to: %s"
+msgstr "Fine 'timelapse': %s"
+
+#: ../imgWCallbacks.c:1991
+msgctxt "main"
+msgid "TimeLapse set to use frame count driven start and stop plus interval"
+msgstr "Modo 'timelapse' impostato per avvio e termine sul conteggio immagini + "
+"intervallo"
+
+#: ../imgWCallbacks.c:2007
+msgctxt "main"
+msgid "TimeLapse set to use calendar driven start and stop plus interval"
+msgstr "Modo 'timelapse' impostato per avvio e termine sul calendario + intervallo"
+
+#: ../imgWCallbacks.c:2051
+#, c-format
+msgctxt "main"
+msgid "Time Lapse period set to: %d"
+msgstr "Intervallo del 'timelapse': %d"
+
+#: ../imgWCallbacks.c:2086
+msgctxt "main"
+msgid "Add date to naming convention selected"
+msgstr "Aggiungere la data al nome immagine"
+
+#: ../imgWCallbacks.c:2090
+msgctxt "main"
+msgid "Add date to naming convention removed"
+msgstr "Non aggiungere la data al nome immagine"
+
+#: ../imgWCallbacks.c:2099
+msgctxt "main"
+msgid "Add time to naming convention selected"
+msgstr "Aggiungere l'orario al nome immagine"
+
+#: ../imgWCallbacks.c:2103
+msgctxt "main"
+msgid "Add time to naming convention removed"
+msgstr "Non aggiungere l'orario al nome immagine"
+
+#: ../imgWCallbacks.c:2120
+msgctxt "main"
+msgid "Add filter to naming convention selected"
+msgstr "Aggiungere il fitro al nome immagine"
+
+#: ../imgWCallbacks.c:2126
+msgctxt "main"
+msgid "Add filter to naming convention removed"
+msgstr "Non aggiungere il filtro al nome immagine"
+
+#: ../imgWCallbacks.c:2138
+#, c-format
+msgctxt "main"
+msgid "Filter name: %s add to naming convention"
+msgstr "Aggiungere il filtro %s al nome immagine"
+
+#: ../imgWCallbacks.c:2143
+msgctxt "main"
+msgid "Filter name removed from naming convention"
+msgstr "Non aggiungere il filtro al nome immagine"
+
+#: ../imgWCallbacks.c:2167
+#, c-format
+msgctxt "main"
+msgid "Save format set to: %s"
+msgstr "Formato file impostato a: %s"
+
+#: ../imgWCallbacks.c:2199 ../imgWCallbacks.c:2244
+msgctxt "cooling"
+msgid "Reading tec"
+msgstr "Lettura tec"
+
+#: ../imgWCallbacks.c:2204
+#, c-format
+msgctxt "main"
+msgid "Tec controlling thread failed to start (%s)"
+msgstr "Non è stato possibile avviare il controllo del raffreddamento (%s)"
+
+#: ../imgWCallbacks.c:2227 ../imgWCallbacks.c:2255 ../imgWCallbacks.c:2269
+#: ../imgWindow.c:691
+msgctxt "cooling"
+msgid "Enable tec read"
+msgstr "Avvia lettura tec"
+
+#: ../imgWCallbacks.c:2265
+#, c-format
+msgctxt "main"
+msgid "Camera %s does not have a controllable tec"
+msgstr "Il modello %s non supporta il controllo del raffreddamento"
+
+#: ../imgWCallbacks.c:2287
+msgctxt "cooling"
+msgid "Auto mode"
+msgstr "Automatico"
+
+#: ../imgWCallbacks.c:2292 ../imgWCallbacks.c:2313
+#, c-format
+msgctxt "main"
+msgid "Tec set auto to: %+06.2FC"
+msgstr "Controllo automatico temperatura a: %+06.2FC"
+
+#: ../imgWCallbacks.c:2298 ../imgWindow.c:700
+msgctxt "cooling"
+msgid "Manual mode"
+msgstr "Manuale"
+
+#: ../imgWCallbacks.c:2303
+msgctxt "main"
+msgid "Tec set manual"
+msgstr "Controllo manuale della temperatura"
+
+#: ../imgWCallbacks.c:2376
+#, c-format
+msgctxt "cfw"
+msgid "Filter wheel mode set: %s"
+msgstr "Modo ruota porta filtri: %s"
+
+#: ../imgWCallbacks.c:2381
+msgctxt "cfw"
+msgid "Could not set cfw mode"
+msgstr "Impossibile impostare il modo della ruota portafiltri"
+
+#: ../imgWCallbacks.c:2399
+#, c-format
+msgctxt "cfw"
+msgid "Filter wheel serial port: %s"
+msgstr "Porta seriale della ruota porta filtri: %s"
+
+#: ../imgWCallbacks.c:2407
+msgctxt "cfw"
+msgid "Serial port list reloaded"
+msgstr "Lista delle porte seriali ricaricata"
+
+#: ../imgWCallbacks.c:2425
+msgctxt "cfw"
+msgid "Disconnect"
+msgstr "Disconnesso"
+
+#: ../imgWCallbacks.c:2426
+#, c-format
+msgctxt "cfw"
+msgid "Filter wheel connected to %s"
+msgstr "Ruota portafiltri connessa a %s"
+
+#: ../imgWCallbacks.c:2442 ../imgWindow.c:854
+msgctxt "cfw"
+msgid "Connect"
+msgstr "Connetti"
+
+#: ../imgWCallbacks.c:2443
+msgctxt "cfw"
+msgid "Filter wheel disconnected"
+msgstr "Ruota portafiltri disconnessa"
+
+#: ../imgWCallbacks.c:2472
+#, c-format
+msgctxt "cfw"
+msgid "Filter wheel configuration: %d slots, %s model"
+msgstr "Configurazione ruota porta filtri: %d posti, modello %s"
+
+#: ../imgWCallbacks.c:2481
+msgctxt "cfw"
+msgid "Filter wheel controller factory reset done"
+msgstr "Reset di fabbrica della ruota portafiltri completato"
+
+#: ../imgWCallbacks.c:2519
+msgctxt "cfw"
+msgid "Please wait for the filter to reach position..."
+msgstr "Attendere che la ruota portafiltri raggiunga la posizione..."
+
+#: ../imgWCallbacks.c:2520
+msgctxt "cfw"
+msgid "Dialog will disappear when done"
+msgstr "Il messaggio scomparirà al termine dell'operazione"
+
+#: ../imgWFuncs.c:159
+msgctxt "dialog-open"
+msgid "Open File"
+msgstr "Apri file"
+
+#: ../imgWFuncs.c:800
+msgctxt "cfw"
+msgid "Filter wheel reported error"
+msgstr "La ruota porta filtri segnala un errore"
+
+#: ../imgWindow.c:76
+msgctxt "main"
+msgid "Focus"
+msgstr "Anteprima"
+
+#: ../imgWindow.c:77
+msgctxt "main"
+msgid "Capture"
+msgstr "Cattura"
+
+#: ../imgWindow.c:229
+msgctxt "main"
+msgid "Load"
+msgstr "Carica"
+
+#: ../imgWindow.c:449
+msgctxt "settings"
+msgid "Full list"
+msgstr "Tutti"
+
+#: ../imgWindow.c:456
+msgctxt "main"
+msgid "Refresh"
+msgstr "Ricarica"
+
+#: ../imgWindow.c:465
+msgctxt "main"
+msgid "Reset"
+msgstr "Reset"
+
+#. / This is the "no bayer mask" value in the debayer combo box, other values are just intl as they are
+#: ../imgWindow.c:582
+msgctxt "settings"
+msgid "None"
+msgstr "----"
+
+#: ../imgWindow.c:594
+msgctxt "filename"
+msgid "Save As"
+msgstr "Salva come"
+
+#: ../imgWindow.c:603
+msgctxt "filename"
+msgid "Audela naming"
+msgstr "Nomi Audela"
+
+#: ../imgWindow.c:610
+msgctxt "filename"
+msgid "Iris naming"
+msgstr "Nomi Iris"
+
+#: ../imgWindow.c:617
+msgctxt "filename"
+msgid "Zero counter"
+msgstr "Azzera scatti"
+
+#: ../imgWindow.c:624
+msgctxt "filename"
+msgid "Time Lapse"
+msgstr "Time Lapse"
+
+#: ../imgWindow.c:648
+msgctxt "filename"
+msgid "Add date"
+msgstr "Aggiungi Data"
+
+#: ../imgWindow.c:655
+msgctxt "filename"
+msgid "Add time"
+msgstr "Aggiungi Ora"
+
+#: ../imgWindow.c:662
+msgctxt "filename"
+msgid "Add filter"
+msgstr "Aggiungi filtro"
+
+#: ../imgWindow.c:791
+msgctxt "timelapse"
+msgid "Simple mode"
+msgstr "Modo normale"
+
+#. / Value "No CFW" of the cfw combo, please preserve the n-xxxxx format
+#: ../imgWindow.c:823
+msgctxt "cfw"
+msgid "0-None"
+msgstr "0-Nessuna"
+
+#: ../imgWindow.c:824
+msgctxt "cfw"
+msgid "1-QHY Serial"
+msgstr "1-QHY Seriale"
+
+#: ../imgWindow.c:844
+msgctxt "cfw"
+msgid "Refresh"
+msgstr "Ricarica"
+
+#: ../imgWindow.c:875
+msgctxt "cfw"
+msgid "Factory Reset"
+msgstr "Reset di fabbrica"
+
+#. / Label for button to change wheel slot to %d
+#: ../imgWindow.c:911
+#, c-format
+msgctxt "cfw"
+msgid "Slot %d"
+msgstr "Posizione %d"
+
+#: ../imgWindow.c:948
+msgctxt "settings"
+msgid "Camera Controls"
+msgstr "Controlli camera"
+
+#: ../imgWindow.c:950
+msgctxt "settings"
+msgid "User Profiles Settings"
+msgstr "Impostazioni profili utente"
+
+#: ../imgWindow.c:953
+msgctxt "settings"
+msgid "Model"
+msgstr "Modello"
+
+#: ../imgWindow.c:961
+msgctxt "settings"
+msgid "Offset"
+msgstr "Offset"
+
+#: ../imgWindow.c:964
+msgctxt "settings"
+msgid "Gain"
+msgstr "Amp %"
+
+#: ../imgWindow.c:967
+msgctxt "settings"
+msgid "Binning Mode"
+msgstr "Modo binning"
+
+#: ../imgWindow.c:970
+msgctxt "settings"
+msgid "Capture Size"
+msgstr "Dimensione ROI"
+
+#: ../imgWindow.c:973
+msgctxt "settings"
+msgid "Download Speed"
+msgstr "Trasferimento"
+
+#: ../imgWindow.c:979
+msgctxt "settings"
+msgid "Amp Control"
+msgstr "Amplificatore"
+
+#: ../imgWindow.c:982
+msgctxt "settings"
+msgid "Noise reduction"
+msgstr "Riduzione rumore"
+
+#: ../imgWindow.c:985
+msgctxt "settings"
+msgid "Image depth"
+msgstr "Profondità bpp"
+
+#: ../imgWindow.c:990
+msgctxt "settings"
+msgid "Color mode"
+msgstr "Modo colore"
+
+#: ../imgWindow.c:1012
+msgctxt "cooling"
+msgid "Current °C"
+msgstr "°C Attuale"
+
+#: ../imgWindow.c:1013
+msgctxt "cooling"
+msgid "Temperature / Time"
+msgstr "Grafico temperatura"
+
+#: ../imgWindow.c:1014
+msgctxt "cooling"
+msgid "Power %"
+msgstr "Potenza %"
+
+#: ../imgWindow.c:1073
+msgctxt "timelapse"
+msgid "Start"
+msgstr "Inizio"
+
+#: ../imgWindow.c:1094
+msgctxt "timelapse"
+msgid "End "
+msgstr "Fine "
+
+#: ../imgWindow.c:1189
+msgctxt "cfw"
+msgid "Connection"
+msgstr "Connessione"
+
+#: ../imgWindow.c:1195
+msgctxt "cfw"
+msgid "Configuration"
+msgstr "Configurazione"
+
+#: ../imgWindow.c:1226
+msgctxt "main"
+msgid "Camera"
+msgstr "Modello"
+
+#: ../imgWindow.c:1227
+msgctxt "main"
+msgid "Cooling"
+msgstr "TEC"
+
+#: ../imgWindow.c:1228
+msgctxt "main"
+msgid "Filename"
+msgstr "Nome file"
+
+#: ../imgWindow.c:1229
+msgctxt "main"
+msgid "Scripting"
+msgstr "Automazione"
+
+#: ../imgWindow.c:1230
+msgctxt "main"
+msgid "Timelapse"
+msgstr "Timelapse"
+
+#: ../imgWindow.c:1231
+msgctxt "main"
+msgid "Fits"
+msgstr "Fits"
+
+#: ../imgWindow.c:1232
+msgctxt "main"
+msgid "CFW"
+msgstr "CFW"
+
+#: ../imgWindow.c:1233
+msgctxt "main"
+msgid "FOV Calc"
+msgstr "Calcolo FOV"
+
+#: ../imgWindow.c:1268
+msgctxt "main"
+msgid "Exp. time (s)"
+msgstr "Tempo (s)"
+
+#: ../imgWindow.c:1270
+msgctxt "main"
+msgid "Total shots"
+msgstr "Scatti totali"
+
+#: ../imgWindow.c:1272
+msgctxt "main"
+msgid "Saved shots"
+msgstr "Scatti salvati"
+
+#: ../libusbio.c:96
+msgctxt "usbio"
+msgid "Error: Camera found, but did not open!"
+msgstr "Errore: Camera trovata, ma connessione fallita!"
+
+#: ../libusbio.c:105
+msgctxt "usbio"
+msgid "Error: Camera NOT found!"
+msgstr "Errore: Camera NON trovata!"
+
+#. / Capture size values list, just translate "Full" (frame)
+#: ../qhy11.c:79 ../qhy7.c:80 ../qhy8l.c:79 ../qhy9.c:79
+msgctxt "camio"
+msgid "Full|512x512|256x256:0"
+msgstr "Tutto|512x512|256x256:0"
+
+#. / Combo box values list, keep N-<desc> format. Just translate <desc>
+#: ../qhy11.c:81 ../qhy2old.c:85 ../qhy5ii.c:93 ../qhy6.c:81 ../qhy6old.c:85
+#: ../qhy7.c:82 ../qhy8l.c:81 ../qhy8old.c:85 ../qhy9.c:81
+msgctxt "camio"
+msgid "0-Slow|1-Fast:0"
+msgstr "0-Lento|1-Veloce:0"
+
+#: ../qhy11.c:82 ../qhy2old.c:86 ../qhy6.c:82 ../qhy6old.c:86 ../qhy7.c:83
+#: ../qhy8l.c:82 ../qhy8old.c:86 ../qhy9.c:82
+msgctxt "camio"
+msgid "0-AmpOff|1-AmpOn|2-Auto:2"
+msgstr "0-Spento|1-Acceso|2-Automatico:2"
+
+#: ../qhy11.c:89 ../qhy7.c:90 ../qhy9.c:90
+msgctxt "camio"
+msgid "5-Positions|6-Positions|7-Positions|8-Positions:0"
+msgstr "5-Posizioni|6-Pisizioni|7-Posizioni|8-Posizioni:0"
+
+#: ../qhy11.c:118 ../qhy2old.c:123 ../qhy5.c:132 ../qhy5ii.c:131 ../qhy6.c:118
+#: ../qhy6old.c:123 ../qhy7.c:119 ../qhy8l.c:118 ../qhy8old.c:122
+#: ../qhy9.c:119
+msgctxt "camio"
+msgid "Camera still not found after reset"
+msgstr "Camera non trovata anche dopo il reset"
+
+#: ../qhy11.c:121 ../qhy2old.c:126 ../qhy5.c:135 ../qhy5ii.c:134 ../qhy6.c:121
+#: ../qhy6old.c:126 ../qhy7.c:122 ../qhy8l.c:121 ../qhy8old.c:125
+#: ../qhy9.c:122
+msgctxt "camio"
+msgid "Neither raw device nor programmed camera found."
+msgstr "Dispositivo e/o camera programmata non trovati"
+
+#: ../qhy11.c:124 ../qhy2old.c:129 ../qhy5.c:138 ../qhy5ii.c:137 ../qhy6.c:124
+#: ../qhy6old.c:129 ../qhy7.c:125 ../qhy8l.c:124 ../qhy8old.c:128
+#: ../qhy9.c:125
+msgctxt "camio"
+msgid "This camera also needs a loader that was not found"
+msgstr "Questo modello necessita di 'loader' che non è stato trovato"
+
+#: ../qhy2old.c:87
+msgctxt "camio"
+msgid "1-Single|2-Double:0"
+msgstr "1-Singola|2-Doppia:0"
+
+#. / Descriptiopn for "mode" combo box
+#: ../qhy2old.c:89 ../qhy6old.c:89
+msgctxt "camio"
+msgid "Mode S/D Image"
+msgstr "Modo acquisizione"
+
+#. / Combo box values list, keep N-<desc> format. Just translate <desc>
+#: ../qhy5.c:99
+msgctxt "camio"
+msgid "0-Off|1-0n:0"
+msgstr "0-Spenta|1-Accesa:0"
+
+#. / Descriptiopn for "mode" combo box
+#: ../qhy5ii.c:97
+msgctxt "camio"
+msgid "Usb bus speed"
+msgstr "Velocità bus Usb"
+
+#. / Combo box values list, keep N-<desc> format. Just translate <desc>
+#: ../qhy5ii.c:341
+msgctxt "camio"
+msgid "0-Off|1-On:0"
+msgstr "0-Spento|1-Acceso"
+
+#. / Capture size values list, just translate "Full" (frame)
+#: ../qhy6.c:79
+msgctxt "camio"
+msgid "Tutto|288x288|144x144:0"
+msgstr ""
+
+#: ../qhy6old.c:87
+msgctxt "camio"
+msgid "1-Single|2-Double|3-Vbe Sampling|4-Vbe Timing:0"
+msgstr "1-Singola|2-Doppia|3-Campioni|4-Tempo:0"
+
+#: ../qhy9.c:83
+msgctxt "camio"
+msgid "0-Light|1-Dark:0"
+msgstr "0-Light|1-Dark:0"
+
+#. / Descriptiopn for "mode" combo box
+#: ../qhy9.c:85
+msgctxt "camio"
+msgid "Light/Dark mode"
+msgstr "Modo Light/Dark"
+
+#: ../qhycore.c:179
+#, c-format
+msgctxt "qhycore"
+msgid "cameraIO failed, error %d"
+msgstr "Errore in cameraIO (%d)"
+
+#: ../qhycore.c:198
+#, c-format
+msgctxt "qhycore"
+msgid "cameraiIO failed, error %d"
+msgstr "Errore in cameraiIO (%d)"
+
+#: ../qhycore.c:227
+msgctxt "qhycore"
+msgid "Error: Could not claim interface."
+msgstr "Errore: richiesta interfaccia fallita"
+
+#: ../qhycore.c:233
+msgctxt "qhycore"
+msgid "Error: Could not set device configuration."
+msgstr "Errore: impossible settare la configurazione"
+
+#: ../qhycore.c:244
+msgctxt "qhycore"
+msgid "Error: Could not initialise libusb."
+msgstr "Errore: impossibile inizializzare libusb"
+
+#: ../qhycore.c:553
+#, c-format
+msgctxt "qhycore"
+msgid "EepromRead failed, error %d"
+msgstr "Errore in EepromRead (%d)"
+
+#: ../qhycore.c:568
+#, c-format
+msgctxt "qhycore"
+msgid "I2CTwoWrite failed, error %d"
+msgstr "Errore in I2CTwoWrite (%d)"
+
+#: ../ttycom.c:703
+msgctxt "tty"
+msgid "No Error"
+msgstr "Nessun errore"
+
+#: ../ttycom.c:707
+#, c-format
+msgctxt "tty"
+msgid "Read Error: %s"
+msgstr "Errore di lettura: %s"
+
+#: ../ttycom.c:712
+#, c-format
+msgctxt "tty"
+msgid "Write Error: %s"
+msgstr "Errore di scrittura: %s"
+
+#: ../ttycom.c:717
+#, c-format
+msgctxt "tty"
+msgid "Select Error: %s"
+msgstr "Errore di selezione: %s"
+
+#: ../ttycom.c:722
+msgctxt "tty"
+msgid "Timeout error"
+msgstr "Errore di timeout"
+
+#: ../ttycom.c:727
+#, c-format
+msgctxt "tty"
+msgid ""
+"Port failure Error: %s. Try adding your user to the dialout group and "
+"restart (sudo adduser $username dialout)"
+msgstr "Errore %s sulla porta, Provare aggiungendo il proprio utente al gruppo dialout e"
+"riavviare (sudo adduser $username dialout)"
+
+#: ../ttycom.c:729
+#, c-format
+msgctxt "tty"
+msgid "Port failure Error: %s.Check if device is connected to this port."
+msgstr "Errore %s sulla porta. Controllare che il dispositivo sia connesso alla porta"
+
+#: ../ttycom.c:735
+msgctxt "tty"
+msgid "Parameter error"
+msgstr "Errore nei parametri"
+
+#: ../ttycom.c:744
+msgctxt "tty"
+msgid "Error: unrecognized error code"
+msgstr "Codice errore sconosciuto"

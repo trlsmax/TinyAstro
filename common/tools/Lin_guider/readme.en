@@ -1,0 +1,252 @@
+1. About
+=============================== 
+	Lin_guider is a simple autoguider program for Linux operating system.
+	It is designed to help you get quality astroimages with long exposure. Once connected to your astro hardware and properly configured, Lin_guider will compensate for the periodic tracking errors of your telescope mount during the exposure time. This will help get images without blurred stars. In addition, the program allows for the examination of the periodic error of your mount due to the ability to write deviational plots. If you like taking planetary images, Lin_guider can record video without compression in the AVI format.
+
+2. Supported hardware
+=============================== 
+	The video capture equipment and the link to your telescope mount are needed for the operation of the autoguider.
+	The autoguider ST-4 port is used for the connection to the telescope mount.
+
+	Supported video hardware:
+	-------------------------------------- 
+	1. webcams, operating via UVC-kernel driver (almost all webcams)
+	2. Phillips-webcams, operating via PWC-kernel driver (740, 840, spc900nc and some others)
+	3. DSI 2 PRO astrocamera
+	4. QHY black/white 1/2"
+	5. QHY6 black/white 1/3"
+	6. QHY5L-II-M black/white
+	7. QHY5-II black/white
+
+	Supported webcam colour video formats:
+	-------------------------------------------------- 
+	YVU420, YUV420, JPEG, MJPEG, YUYV. 
+	Webcams, that do not support any of these formats, are not yet supported.
+
+	Supported actuators (ST-4):
+	----------------------------------------- 
+	1. LPT-switches (such as relay units)
+	2. USB-switches, based on FTDI-chips (ftdi232, ftdi245) and operating in the bitbang-mode. (for example, boxes made by Ivan Ionov)
+	3. QHY5 - ST-4 port
+	4. QHY6 - ST-4 port
+	5. QHY5L-II-M black/white
+	6. QHY5-II black/white
+	7. GPIO driver for ARM platforms and platforms with gpio
+	8. GPUSB
+
+	Stability table of the video drivers:
+	-------------------------------------
+	Device       | Stability
+	-------------+----------------
+	UVC          | Stable
+	PWC          | Stable
+	DSI          | Stable
+	QHY5         | Stable
+	QHY6         | Stable
+	QHY5L-II-M   | Unstable
+	QHY5-II      | Unstable
+	
+	Stability table of the pulse-drivers:	
+	-------------------------------------
+	Device       | Stability
+	-------------+----------------
+	QHY5         | Stable
+	QHY6         | Stable
+	QHY5L-II-M   | Stable
+	QHY5-II      | Stable
+	LPT          | Stable
+	FTDI         | Stable
+	GPIO         | Stable
+	GPUSB        | Stable
+	
+	Important:
+	-----------
+	Drivers of the devices with the experimental support and known defects are labeled as unstable.
+	The source of the instability can be the driver as well as the low quality manufacturer's firmware.
+	In case of problems with the unstable drivers, it is recommended to close the program and reconnect the
+	device to restart its firmware.
+
+3. System requirements
+=============================== 
+	CPU - 700 MHz or higher
+	RAM - 256 Mb or higher
+	USB ports
+	OS - Linux 32/64 bits
+	QT4.5 or later
+	libusb-1.0 
+
+
+4. Building and installation
+=============================== 
+	You can get the executable file of the program by compiling it from the source code.
+	To do this:
+	1. install QT4 version 4.5 or later, including dev-packages
+	2. install libusb-1.0, including dev-packages
+	3. install fxload (necessary for the owners of QHY5, QHY6, DSI2PRO)
+	4. open a terminal and navigate to the directory with the unpacked program
+		$ cd /home/user/path/to/lin_guider 
+	5. run "configure"
+		$ ./configure 
+	6. run "make"
+		$ make 
+	Hence you will get the executable file of the program, compiled and optimised specifically for your system.
+
+	7. Download the package with the firmwares and udev rules from https://sourceforge.net/projects/cccd/files/firmware/
+		If the direct installation in your distributive is impossible, then:
+		7.1. unpack the package
+		7.2. copy all files with firmwares *.hex from the package to the directory /lib/firmware/ccd 
+		7.3. copy all files with *.rules extention to your directory with the udev rules. This directory for Debian is /lib/udev/rules.d
+		7.4. restart udev
+			# /etc/init.d/udev restart
+
+5. Setting up the hardware
+=============================== 
+	Before starting to work with the program, make sure your video equipment and the mount actuator are properly identified and operational.
+	!!! WARNING!!!
+	---------------- 
+	To avoid possible problems with the access privileges for the devices, check that your user belongs to the following groups:
+	1. video 
+	2. plugdev (or analog, if there is no such group)
+	3. lp 
+	4. lpadmin 
+
+	If you use a webcam, you can check it with the program 'guvcview'. You will see the list of all formats and operation modes of your camera upon starting guvcview in the console.
+	If you use QHY5 or QHY6, check the dmesg command output in the terminal after the connection of the camera to the computer. The connection of the unknown device must be seen in the last lines of the output, followed by the change in its VID:PID and the appearance of the device with QHY label. In addition, there are third party console programs for QHY, which could be used to gain experience in starting QHY under Linux.
+	As for the actuators, no additional settings or tests are needed for the LPT-actuators. As for the FTDI-switches, you should install the supplied udev rule. If the QHY5 or QHY6 camera is successfully initialized, no additional activities are required.
+
+	It is recommended that the first launches of the program are made in the terminal in order to see additional information output in console. You should setup the video hardware and the actuator, followed by pulse driver in the first place after the launch.
+
+	4.1. Video hardware setup
+	------------------------------- 
+	Open the dialogue box 'Guider setup' in the toolbar.
+	Set the checkbox 'debug verbosity' to checked in the first place. This will allow for the maximum information to be seen, inluding errors.
+	Then it is necessary to specify the video device you will work with. To do this, you should select device in dropdown list 'Device'.
+	
+	It is neccessary to restart the program for the connection to the specified device to occur.
+	The image from the video device must appear after the reboot. In this case, you can move to the setup of the guider actuator.
+	If the device initialization was not successful and the error window was displayed, you should check the console log for more detailed information.
+	You could also need to specify the required frequency of frames per second (FPS) and the size of the captured image. You should know that the exposure time of one frame is calculated as 1/fps, i.e. if fps is set to 5 (fps = 5), the exposure time of one frame will be 1/5 = 200 milliseconds. This time doesn't account for the time required for the data transfer and its postprocessing. That's why real FPS is somewhat smaller, than the chosen one. This difference doesn't influence substantially the guiding quality. You should test such parameters, as 'Autogain', 'Gain', 'Expo' (if they are available), on the image and watch how it will change.
+	The 'BW' parameter makes the screen layout monochromatic for several graphics formats, thus slightly decreasing the CPU usage.
+	The 'half fps' parameter makes the screen layout of every second frame. It affects only the screen layout and decreases the CPU usage, all frames are objectively captured and processed by the autoguider.
+	You can switch the 'use calibration' parameter on, if you are planning to calibrate the camera with a dark frame.
+	 
+	4.2. Actuator setup
+	------------------------------------------ 
+	Open the dialogue box 'Driver setup' in the toolbar.
+	You should choose the device to work with from the dropdown list in the first place.
+	
+	It is neccessary to restart the program for the connection to the specified device to occur. If all went right, the program would start without pulse driver error messages. If the box with the pulse driver initialization error message appeared, you should check the console log for more details.
+	If the launch is successful, open the dialogue box 'Driver setup' and check that the guiding device functions properly.
+	There are several ways to do this:
+	1. by pressing test buttons RA+-, DEC+- in the dialogue box and checking the LED indication on the device (FTDI boxes).
+	2. by pressing test buttons RA+-, DEC+- in the dialogue box and listening to the sound of operating relays (LPT relay units)
+	3. by pressing test buttons RA+-, DEC+- in the dialogue box and testing RA/DEC commutator and ground pins for continuity with the multi-meter (all types of devices).
+	If the test is successful, you can connect the device to the autoguider port and start guiding. The operations described above are not sufficient sometimes. For example, the owners of relay units can face the dead time problem, when the sequence of commands "close-open-close" arrives too fast and the relay doesn't close and remains open. This could lead to serious disruptions in guiding. To eliminate this effect, the owners of relay units should turn the use of dead time DT on and choose it experimentally as low as possible, but so as to prevent any gaps.
+	The owners of GPIO, LPT and FTDI boxes may as well face the necessity to switch the correspondence between the virtual and real control bits (connector pins). Devconf-files are used for this purpose. They will be described below.
+	If your switch receives commands in the inverted form ( close - 0, not 1), you will need to set the checkbox "inverse bits" to checked. You can also assign the desired actions to the appropriate virtual bits in the 'Driver setup' dialogue box. These include RA+, RA-, DEC+, DEC- or to turn the bit off.
+	Indeed, everything is much simpler for the special astro cameras with the ST-4 connector, and the described above is irrelevant.
+
+
+6. Setting up the physical parameters of the guider
+======================================= 
+	When the video device and the telescope mount control device are connected and working in the program, you must specify several parameters before the guiding can be started. You need to define in the dialogue box 'Guider setup':
+	1. Aperture - the diameter of the guide objective, mm.
+	2. Focal length - the focal length of your guide, mm.
+	3. Matrix width - the amount of matrix pixels in horizontal direction, pixs.
+	4. Matrix height - the amount of matrix pixels in vertical direction, pixs.
+	6. Pixel width - the width of a pixel, um.
+	7. Pixel height - the height of a pixel, um.
+	 
+	!!! WARNING!!!
+	---------------- 
+	Some camera types, including webcams, allow for more than one resolution, for example 320x240 and 640x480. In this case you should set up the pixel size very attentively. For example, let's consider Philips SPC 900 NC camera, that has matrix with 640x480 pixels, their size being 5.6x5.6 um. If we choose the default camera resolution of 640x480 in the list of available resolutions, the pixel size will be defined as 5.6x5.6 um, just as in the camera specification. If we choose the resolution 320x240, the pixel size must be defined as 11.2x11.2 um. I.e. the pixel size should be chosen higher, the lower the screen resolution has been chosen. Otherwise, the scale of all displayed and calculated values will be disrupted.
+
+
+7. Calibration
+=============================== 
+	It is necessary to calibrate the autoguide before the start of the guiding. To do this you have to complete at least one procedure - determination of the orientation of the celestial reference frame in the image, taken from the camera. In addition, it is advisable to perform camera calibration with the dark frame.
+	 
+	6.1. Determination of the orientaion of the celestial reference frame
+	------------------------------------------------------ 
+	Direct your guide to the star you'd like to use for guiding. Make sure that the star isn't near the image edge. Focus the image. Make sure that all mountings are tightened and the wires do not hang freely.
+	Open the dialogue box 'Calibration'. Use the 'two axes' parameter to choose the two-axes or one-axis calibration.
+	If the polar axis is well aligned, it is recommended to use the automatic mode of calibration - parameter 'auto mode'.                                                                                      
+		6.1.1. Automatic calibration
+		------------------------------- 
+		Set time in seconds during which the drift along axes will be performed. Grab the green square by the mouse pointer and drag it over the guiding star. Make sure that the square follows the star. Press the button 'Start'. The program will start to shift the star along one or two axes afterwards. The result will be shown at the end of calibration. 'Status: DONE' will be shown in the case of successful termination and the axes of reference will take the new position. In case of an error, the window with an error message will be shown. If the polar axis is poorly aligned, the automatic calibration may be terminated with an error. In this case, it is not recommended to perform the photographic surveying. Try to align the polar axis more precisely.
+
+		6.1.2. Manual calibration
+		------------------------ 
+		If the automatic calibration doesn't suit for any reason or terminates with an error, you can perform manual calibration. To do this, grab the green square by the mouse pointer and drag it over the guiding star.p Make sure that the square follows the star. Press the button 'Start'. Next use the mount control panel to shift the star position in RA+ direction and press 'Stop'. If the two-axes mode is engaged, use the control panel to shift the star in the DEC+ direction and press 'Stop' right after the end of the drift along RA. It is important to understand that the longer the shift vector is, the more precise the determination of the celestial coordinates' axes will be.
+		!!! WARNING!!!
+		---------------- 
+		It is recommended, that the square, following the star, doesn't touch the image edges during the calibration.
+
+	6.2. Calibration with the dark frame
+	-------------------------------------- 
+	In order to calibrate the camera with a dark frame, define the amount of frames to accumulate in the field 'Frame count'. Cover the guide objective to prevent light from penetrating the camera and press the 'Start' button. At the end of the process the dark frame will be formed, that will be substracted from every new frame, taken from the camera, if the 'use calibration' parameter is chosen in the dialogue box of the guide setup.
+
+
+8. Guiding
+=============================== 
+	You can start guiding after the celestial reference frame is determined. Open the dialogue box 'Guiding'.
+Set the appropriate size of the square, following the star - 'Square size'. The square area shouldn't be too small or too large, compared to the visible size of the star.
+	Choose the threshold algorithm, used to calculate the star position, 'Threshold alg.'
+	The value 'Smart' is the more precise dynamic threshold calculation, compared to 'Auto'.
+	The value 'Auto' is the dynamic threshold calculation.
+	The value 'No thresh.' - threshold calculation is disabled.
+	Next you have to specify parameters in the 'Control' block. All parameters are defined separately for each axis RA and DEC. These parameters are:
+	1. Enable directions - enables or disables the use of calculated axis corrections. All is enabled by default.
+	2. Accumulate frames - enables the averaging of the coordinate values, using N frames, and the transfer of corrections at the end of the averaging. Set to 1 by default.
+	3. Proprtional gain - is the coefficient of the proportional term in the PID control. May be precalculated in the 'Info' block by default.
+	4. Integral gain - is the coefficient of the integral term in the PID control. Set to 0 by default.
+	4. Derivative gain - is the coefficient of the differential term in the PID control. Set to 0 by default. (disabled in this version)
+	6. Maximum pulse - the maximum duration of the correction pulse. Limited by the specific type of the actuator. Set to 5000 ms by default.
+	7. Minimum pulse - the minimum duration of the correction pulse. Set to 100 ms by default.
+	8. Avg.frm. - disabled.
+
+	PID control coefficients adjustment should by performed empirically, using the specific equipment and with full load. The idea of the adjustment is to find coefficients that don't lead to 'under-guiding' (corrections are too slow) or 'over-guiding' (sinusoidal oscillations with increasing amplitude).
+	It is recommended to choose the range of values from 10 to slightly more than the recommended value during the selection of the proportional coefficient (see 'Info' block) and move through this region with the step of 10, looking attentively, how the result of the guiding will change.
+	The selection of the integral coefficient is recommended to perform, if there is constant impact in one direction. This coefficient will allow for the faster correction of the impact, because it takes into account the previous guiding history.
+	The differential coefficient, as has been said above, is disabled at the moment.
+ 
+	!!!WARNING!!!
+	-------------- 
+	You should bear in mind during the selection of the coefficients, that their values may vary for different axes.
+
+	If the polar axis is well aligned, then the guiding alond the DEC axis can be performed more rarely, every 2-4 frames. This will allow to avoid excessive activity along the axis and unnecessary vibrations. In addition, it is recommended to induce small imbalance (overweight) against the diurnal motion for the RA axis in order to move with constant tension and remove the play. It is recommended to induce a small shift of the polar axis ( for details see the drift method) from the ideal position for the DEC axis in order to make a constant shift in one side and the guiding go in only one direction. This will allow to reduce turbulence in the region of 0.
+
+	The value of 'Maximum pulse' is usually chosen more or less equal to the period of the working cycle (time between two successive camera data captures). Usually there is no need to change this value. The 'Minimum pulse' value is of more improtance. This parameter defines the threshold of the correction duration. If the calculated correction is more or equal to 'Minimum pulse', it is transfered to the mount, otherwise the correction is discarded. If the threshold is too large, then the non-adjustable band of deviations around the zero value will be too wide and the quality of guiding will be too low. If the threshold is too small, then the amount of corrections around the zero value will be very large, leading to constant axis twitching in opposite directions and, as a consequence, badly controlled antidamping. This fact is particularly important for high load setups with low mechanical stiffness.
+
+	You can also save guiding logs in text files with the aid of the guiding dialogue box. To do this, you have to set the checkbox 'save drift' to checked and specify the file name in the 'Configuration block'. The file format is a plain text with two columns with numbers - deviations along RA and DEC.
+
+9. External control
+===============================
+	Beginning with the version 2.8 the autoguider is the TCP server in the Unix domain. The server accepts incoming client connections and executes requests.
+	With the aid of the server requests the "DITHERING" technique widely used in the astrophotography is realized.
+	You can see the full list of the server requests as well as the protocol of requests and responses in the example
+	lin_guider/tests/remote_client.c
+
+	Besides, the autoguider can be customized to ditribute information messages via UDP.
+	You can see the full list of messages in the program options. To demonstrate the reception and display of the messages you can use the example
+	lin_guider/tests/event_monitor.pl
+
+10. General recommendations
+=============================== 
+1. Everything on the photographic setup should be tightened: focusers, camera mounts, mounting of the optical tubes to each other and to the telescope mount, mounting of the mount head to the tripod/column, etc. The camera wires shouldn't dangle. The floppy cable parts should be as short as possible.
+2. It is recommened to induce small imbalance along RA in the direction opposite to the diurnal rotation. 
+3. If the guiding star is too bright, It is recommended to adjust camera (if the hardware allows) to eliminate overluminance.
+4. The change in camera parameters (Gain, FPS, etc.) requires the obligatory recalibration of the camera with the dark frame, if it is used.
+5. It is recommended to use the two-axes calibration method in the near-polar regions, where the drift along RA is very short during the calibration.
+
+
+------------------------------- 
+Dark sky and successful guiding!
+
+Author: Andrew Stepanenko (Galaxy Master)
+(c)GM software' 08-13
+
+Project page: http://sourceforge.net/projects/linguider/
+Support: galaxy_master@mail.ru
+
+English translation by Alexander Stepanenko

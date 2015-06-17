@@ -1,0 +1,52 @@
+2014-04-05 Lin_guider 2.10.0 (c)Galaxy Master  <galaxy_master@mail.ru>
+
+	* Added Nexstar IO driver
+	* Added support of QHY5L-II-C with color balance
+	* Improved stability of QHY5(L)-II-(C,M) driver
+	* Multiple video-subsystem improvements
+	* Improved direction control of guider
+	* Misc. improvements and bugfixes
+
+2013-10-10 Lin_guider 2.9.0 (c)Galaxy Master  <galaxy_master@mail.ru>
+
+	* Added GPUSB IO driver
+	* Added GPIO IO driver for Raspberry Pi and similar boards with GPIO
+	* Server has been refactored and supports long time commands now
+	* Added new feature - DITHERING. Now it's possible to make dithering using CCD 
+	(http://http://sourceforge.net/projects/cccd/) or your own client. (See remote_client.c for example)
+	* Added experimental support of QHY5L-II-M (video and pulse drivers)
+	* Added experimental support of QHY5-II (video and pulse drivers)
+
+2012-09-09 Lin_guider 2.8.0 (c)Galaxy Master  <galaxy_master@mail.ru>
+
+	* Added image quality estimation
+	* Added quality based guiding control with two thresholds 
+	* Added guiding stability estimation
+	* Added autofind star ability
+	* Improved algorithm of double-axis calibration method
+	* Added automatic adjustment of the directions for DEC corrections in double-axis calibration
+	* Fixed possible out-of-matrix movements during calibration
+	* Added possibility of manual swapping of the directions for DEC corrections during guiding
+	* Improved video device selector
+	* Added sky simulator for NULL-camera with stars, turbulence, etc.
+	* Added network UDP notifications for several important events (i.e. picture quality, stability, etc.)
+	* Added demo PERL-script for receiving and printing all network notifications
+	* Added new 'Settings' dialog
+	* Added base remote control by persistent connection in UNIX domain
+	* Added set of commands for remote control. (version, positioning of guider suare, save video frame)
+	* Added C demo client for remote control
+	* Bugfixes
+
+2011-09-25 Lin_giuder 2.7.0 (c)Galaxy Master  <galaxy_master@mail.ru>
+
+	* Reticle calibration by two axes RA and DEC
+	* Video calibration by "Dark" frame
+	* Mathimatical frame buffer of 'double' precision
+	* Added new threshold algorithm
+	* Added scrollbars for video window
+	* Added calculation of root mean square deviation for DEC
+	* Great bugfix of guider function for QHY5 and QHY6.(removed useless waiting on mutex)
+	* Added 'Installer/Uninstaller'
+	* Added manual for Lin_guider. (now in Russian. English text will coming soon)
+	* And some other minor changes...
+	* Added time labels for logger

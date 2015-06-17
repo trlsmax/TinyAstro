@@ -1,0 +1,125 @@
+<html>
+	<head>
+		<title>TinyAstro</title>
+<link href="ajaxfileupload.css" type="text/css" rel="stylesheet">
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="ajaxfileupload.js"></script>
+	<script type="text/javascript">
+
+	$(document).ready(function(){
+	    $('.button').click(function(){
+		var clickBtnValue = $(this).val();
+		var ajaxurl = 'power.php',
+		data =  {'action': clickBtnValue};
+		$.post(ajaxurl, data, function (response) {
+		    // Response div goes here.
+		    //alert("action performed successfully");
+		});
+	    });
+
+	});
+
+	function ajaxFileUpload()
+	{
+		$("#loading")
+		.ajaxStart(function(){
+			$(this).show();
+		})
+		.ajaxComplete(function(){
+			$(this).hide();
+		});
+
+		$.ajaxFileUpload
+		(
+			{
+				url:'doajaxfileupload.php',
+				secureuri:false,
+				fileElementId:'fileToUpload',
+				dataType: 'json',
+				data:{name:'logan', id:'id'},
+				success: function (data, status)
+				{
+					if(typeof(data.error) != 'undefined')
+					{
+						if(data.error != '')
+						{
+							alert(data.error);
+						}else
+						{
+							alert(data.msg);
+						}
+					}
+				},
+				error: function (data, status, e)
+				{
+					alert(e);
+				}
+			}
+		)
+		
+		return false;
+
+	}
+	</script>	
+<script id="source" language="javascript" type="text/javascript">
+	function setdatetime() {
+		var d = new Date();
+		var year=d.getFullYear();
+		var month=d.getMonth();
+		month+=1;
+		var day=d.getDate();
+		var hour = d.getHours();
+		var min = d.getMinutes();
+		var sec = d.getSeconds();
+		var ymd = year + "-" + month + "-" + day;
+		var hms = hour + ":" + min + ":" + sec;
+		//document.write(ymd + " " + hms + "<br>");
+		var url = "update_time.php?date=" + ymd + "&time=" + hms;
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function()
+		{
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+			{
+				document.getElementById("time").innerHTML=xmlhttp.responseText;
+			}
+		}
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send(null);
+	}
+</script>
+
+	</head>
+
+	<body onload=setdatetime()>
+<div id="wrapper">
+    <div id="content">
+	<div id="time_content">
+		<h1>Server Time Now:</h1><br>
+		<h2><div id="time"></div></h2>
+	</div>
+	<hr>
+	<br><br>
+	<h1>Upload File to TinyAstro</h1><br>
+	<img id="loading" src="loading.gif" style="display:none;">
+	<form name="form" action="" method="POST" enctype="multipart/form-data">
+	<div class="fileinputs">
+		<input id="fileToUpload" class="file" type="file" name="fileToUpload" onchange="return ajaxFileUpload();">
+		<div class="fakefile">
+			Upload
+		</div>
+	</div>
+	<!--<button class="button" id="buttonUpload" onclick="return ajaxFileUpload();">Upload</button>-->
+	</form>    	
+	<br><br>
+	<div>
+	<hr>
+	<br><br>
+	<h1>Power Control of TinyAstro</h1><br>
+	<input id="reboot" type="submit" class="button" name="reboot" value="reboot" />
+	<input id="halt" type="submit" class="button" name="halt" value="halt" />
+	</div>
+    </div>
+</div>
+	</body>
+</html>
+

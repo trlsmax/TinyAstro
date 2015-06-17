@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# ********************************************
+# This is part of "create_odroid_image" script
+# Do not execute !!
+# ********************************************
+
+# *****************************************************************
+# Set hostname, user to be created & root and user passwords      *
+# *****************************************************************
+HOSTNAME="TinyAstro"
+
+USER="astro"
+
+ROOTPASS="ASTRONOMY"
+
+USERPASS="astronomy"
+
+# Set timezone, for default (HOST'S) set  _timezone=""
+#_timezone="Etc/UTC"
+_timezone=""
+
+# IF YOU WANT TO INSTALL THE LANGUAGE DIFFERENT THEN THE HOST's:
+# COMMENT FOR DEFAULT (HOST) settings
+LANGUAGE="en"
+LANG="en_US.UTF-8"
+# *****************************************************************
+
+
+export DEBIAN_FRONTEND=noninteractive
+
+
+_LOGFILE="/install.log"
+
+_excode=0
+
+# ---- Internal: wait for process to end --------
+proc_wait() {
+    spin='-\|/'
+
+    i=0
+    while kill -0 $1 2>/dev/null
+    do
+      i=$(( (i+1) %4 ))
+      printf "\r$2 ${spin:$i:1}"
+      sleep .1
+    done
+    _excode=$?
+
+    if [ $_excode -eq 0 ]
+    then
+      printf "\rOK.                        \n"
+    else
+      printf "\rERROR.                     \n"
+      exit 1
+    fi
+}
+# -----------------------------------------------
+
+
+
+# ====================================================
+
+if [ ! -f /debootstrap/debootstrap ]; then
+    exit 1
+fi
+
+echo "DEBOOTSTRAP, SECOND-STAGE"
+/debootstrap/debootstrap --second-stage #>> $_LOGFILE &
+#pid=$! # Process Id of the previous running command
+#proc_wait $pid "please wait"
+
+if [ ! $_excode -eq 0 ]; then
+  echo "*********************"
+  echo "** debootstrap ERROR."
+  echo "*********************"
+  exit 1
+fi
+
+echo "DEBOOTSTRAP, SECOND-STAGE FINISHED."
+echo ""
+
+mv /sources.list /etc/apt/sources.list
+echo "LANG=\"$LANG\"" > /etc/default/locale
+echo "LC_ALL=\"$LANG\"" >> /etc/default/locale
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys AB19BAC9 #>> $_LOGFILE 2>&1
+
+echo "Updating..."
+apt-get update #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+echo "Upgrading..." 
+apt-get -y upgrade #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+apt-get clean #>> $_LOGFILE 2>&1
+
+# ** INSTALL essential packages
+echo "Installing base packages..."
+apt-get -y install upstart-sysv apt-utils locales dialog sudo isc-dhcp-client udev netbase ifupdown iproute dropbear iputils-ping wget curl ntpdate ntp less tzdata module-init-tools lsb-release u-boot-tools initramfs-tools xz-utils fbset apmd elvis-tiny software-properties-common python-software-properties --no-install-recommends #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please be patient"
+apt-get clean #>> $_LOGFILE 2>&1
+
+# ** generate locale
+echo "gen locale ..."
+locale-gen en_US.UTF-8 #>> $_LOGFILE 2>&1
+locale-gen zh_CN.UTF-8 #>> $_LOGFILE 2>&1
+echo "Done"
+
+# ** INSTALL base language pack for your language
+_DST=`lsb_release -si`
+if [ "${_DST}" = "Ubuntu" ] ; then
+    echo "Installing language pack..."
+    apt-get -y -q install language-pack-$LANGUAGE-base --no-install-recommends #>> $_LOGFILE 2>&1 &
+    #pid=$!
+    #proc_wait $pid "please wait"
+    apt-get clean #>> $_LOGFILE 2>&1
+else
+    cat /etc/locale.gen | sed s/"# $LANG"/"$LANG"/g > /tmp/locale.gen
+    mv /tmp/locale.gen /etc/locale.gen
+    locale-gen #>> $_LOGFILE 2>&1
+fi
+
+# ** INSTALL more packages ....
+# apt-get -y install net-tools wireless-tools wpasupplicant axel build-essential git whiptail unzip
+echo "Installing more packages..."
+apt-get -y install usbutils nano htop tmux dbus btrfs-tools openbox spacefm lxpanel xfonts-base xfonts-wqy xfonts-75dpi xfonts-100dpi net-tools wireless-tools hostapd wpasupplicant dnsmasq unzip bzip2 libqt4-core libqt4-gui libftdi1 libopencv-imgproc2.4 nginx php5-cgi php5-fpm lxtask lxde-icon-theme leafpad lxappearance xvt xorg xserver-xorg-video-dummy x11vnc openssh-client --no-install-recommends #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+apt-get clean #>> $_LOGFILE 2>&1
+
+# ============ install kstars-bleeding ===================
+echo "Add PPA..."
+apt-add-repository -y ppa:mutlaqja/ppa #>> $_LOGFILE 2>&1 &
+apt-add-repository -y ppa:mutlaqja/astrometry.net #>> $_LOGFILE 2>&1 &
+echo "Updating..."
+apt-get update #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+echo "Installing kstars-bleeding from PPA..."
+apt-get -y install kstars-bleeding #>> $_LOGFILE 2>&1 &
+#pid=$!
+#proc_wait $pid "please wait"
+apt-get -y install plasma-workspace
+apt-get clean #>> $_LOGFILE 2>&1
+
+# ========================================================
+
+# install atik driver and shoestring driver
+# install astrometry.net index
+#wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
+dpkg -i /*.deb
+rm /*.deb
+
+# ** configure hostname
+echo $HOSTNAME > /etc/hostname
+echo "127.0.0.1 ${HOSTNAME}" >> /etc/hosts
+
+# ** CONFIGURE time zone, keyboard layout, console ...
+echo "Configuring..."
+if [ ! "${_timezone}" = "" ] ; then
+    echo $_timezone > /etc/timezone
+fi
+#dpkg-reconfigure tzdata ##>> $_LOGFILE 2>&1
+#dpkg-reconfigure keyboard-configuration ##>> $_LOGFILE 2>&1
+#dpkg-reconfigure locales ##>> $_LOGFILE 2>&1
+#dpkg-reconfigure console-setup ##>> $_LOGFILE 2>&1
+
+# ** CREATE root password
+echo "CREATING root PASSWORD..."
+#passwd
+echo root:$ROOTPASS | chpasswd
+
+# ** ADD USER
+echo "ADDING USER..."
+# set default shell to /bin/bash
+cat /etc/default/useradd | sed s/"SHELL=\/bin\/sh"/"SHELL=\/bin\/bash"/g > /tmp/useradd
+mv /tmp/useradd /etc/default/useradd
+useradd -m -s "/bin/bash" $USER #>> $_LOGFILE 2>&1
+echo $USER:$USERPASS | chpasswd
+usermod -c $USER $USER ##>> $_LOGFILE 2>&1
+adduser $USER sudo #>> $_LOGFILE 2>&1
+
+# ENABLE SSH ROOT LOOGIN WITH PASSWORD
+if [ -f /etc/ssh/sshd_config ]; then
+    cat /etc/ssh/sshd_config | sed s/"PermitRootLogin without-password"/"PermitRootLogin yes"/g > /tmp/sshd_config
+    mv /tmp/sshd_config /etc/ssh/sshd_config
+fi
+
+# setup web server
+mv /etc/tinyastro /etc/nginx/sites-available/
+rm /etc/nginx/sites-enabled/*
+ln -s /etc/nginx/sites-available/tinyastro /etc/nginx/sites-enabled/tinyastro
+chown -R www-data:www-data /var/www/*
+
+mv /home/tools /home/astro/
+mv /home/desktop /home/astro/Desktop
+mv /home/gtkrc-2.0 /home/astro/.gtkrc-2.0
+
+ln -s /usr/share/applications/org.kde.kstars.desktop /home/astro/Desktop/kstars.desktop
+ln -s /usr/share/applications/spacefm.desktop /home/astro/Desktop/spacefm.desktop
+
+if [ ! -d /home/astro/.config ] ; then
+    mkdir -p /home/astro/.config
+fi
+
+mv /home/kdeglobals /home/astro/.config/
+mv /home/xinitrc /home/astro/.xinitrc
+mv /home/kstarsrc /home/astro/.config/
+
+#killall -KILL ntpd #> /dev/null 2>&1
+#killall -KILL smbd #> /dev/null 2>&1
+
+chown -R $USER:$USER /home/$USER
+
+echo ""
+echo "Instalation finished."
+echo ""
+touch /_OK_
+
+exit 0

@@ -1,0 +1,30 @@
+#!/bin/sh
+#systemctl mask NetworkManager
+#systemctl mask NetworkManager-dispatcher
+#ln -s /lib/systemd/system/rc-local.service /etc/systemd/system/rc-local.service
+chmod +x /etc/rc.local
+tar xjvfp /modules.tar.bz2
+rm /modules.tar.bz2
+touch /first_boot
+groupadd bluetooth
+usermod -a -G dialout astro
+usermod -a -G sudo astro
+usermod -a -G www-data astro
+usermod -a -G video astro
+usermod -a -G plugdev astro
+usermod -a -G netdev astro
+usermod -a -G bluetooth astro
+echo "inet:x:3003:astro,root" >> /etc/group
+
+cat > /etc/init/serial.conf << _EOF_
+# ttyS0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc or RUNLEVEL=[12345]
+stop on runlevel [!12345]
+
+respawn
+exec /sbin/getty -L 115200 console vt102
+_EOF_

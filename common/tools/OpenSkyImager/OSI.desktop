@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=OSI
+Categories=Utility;
+Exec=/home/astro/tools/OpenSkyImager/gtkImager
+Icon=/home/astro/tools/OpenSkyImager/ico.png
+StartupNotify=true
+Type=Application
+Terminal=false
+MimeType=inode/directory;inode/mount-point;x-scheme-handler/ssh;x-scheme-handler/smb;x-scheme-handler/nfs;x-scheme-handler/ftp;
+GenericName=OpenSkyImager
+Comment=OpenSkyImager
+Keywords=OpenSkyImager;

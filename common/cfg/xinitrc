@@ -1,7 +1,10 @@
 #!/bin/bash
 export QT_QPA_PLATFORMTHEME=kde
-export LANGUAGE=zh_CN.UTF-8
-export LANG=zh_CN.UTF-8
+
+# for Chinese
+#export LANGUAGE=zh_CN.UTF-8
+#export LANG=zh_CN.UTF-8
+
 exec lxpanel &
 exec spacefm --desktop &
 exec openbox-session

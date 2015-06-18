@@ -2,6 +2,19 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+do_udev_update() {
+    mkdir -p $odir/etc/udev/rules.d > /dev/null 2>&1
+    echo "KERNEL==\"mali\",SUBSYSTEM==\"misc\",MODE=\"0777\",GROUP=\"video\"" > $odir/etc/udev/rules.d/10-odroid_mali.rules
+    echo "KERNEL==\"ump\",SUBSYSTEM==\"ump\",MODE=\"0777\",GROUP=\"video\"" >> $odir/etc/udev/rules.d/10-odroid_mali.rules
+    echo "KERNEL==\"ttySAC0\", SYMLINK+=\"ttyACM99\"" > $odir/etc/udev/rules.d/10-odroid-shield.rules
+    echo "KERNEL==\"fb1\", SYMLINK+=\"fb6\"" > $odir/etc/udev/rules.d/50-odroid-hdmi.rules
+    echo "KERNEL==\"CEC\", MODE=\"0777\"" > $odir/etc/udev/rules.d/60-odroid-cec.rules
+    echo "KERNEL==\"amstream*\",SUBSYSTEM==\"amstream-dev\",MODE=\"0666\",GROUP=\"video\"" > $odir/etc/udev/rules.d/10-odroid_am.rules
+    echo "KERNEL==\"amvideo*\",SUBSYSTEM==\"video\",MODE=\"0666\",GROUP=\"video\"" >> $odir/etc/udev/rules.d/10-odroid_am.rules
+}
+
+do_udev_update
+
 # === install Hardkernel's packages ======
 echo "Installing kernel..."
 touch /boot/uImage 

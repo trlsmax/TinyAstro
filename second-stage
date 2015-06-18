@@ -150,7 +150,8 @@ apt-get clean #>> $_LOGFILE 2>&1
 
 # install atik driver and shoestring driver
 # install astrometry.net index
-#wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
+wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
+
 dpkg -i /*.deb
 rm /*.deb
 

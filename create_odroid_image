@@ -85,8 +85,8 @@ repo="http://ports.ubuntu.com/ubuntu-ports"
 # ******************************************************
 # Which board you want to build the image              *
 # ******************************************************
-BOARD=C1
-#BOARD=U3
+#BOARD=C1
+BOARD=U3
 
 # *****************************************************
 # Path to odroid u-boot files                         *
@@ -539,21 +539,18 @@ fi
 # ***************************
 # ** CREATE NEW sources.list:
 # ***************************
+if [ "${BOARD}" = "C1" ]; then
 echo "Changing \"sources.list\""
 case ${distro} in trusty|utopic|precise|vivid)
-if [ "${BOARD}" = "C1" ]; then
 cat >> $odir/etc/apt/sources.list << _EOF_
 deb http://deb.odroid.in/c1/ trusty main
 deb http://deb.odroid.in/ trusty main
 _EOF_
-fi
 ;;*)
-if [ "${BOARD}" = "C1" ]; then
 cat >> $odir/etc/apt/sources.list << _EOF_
 deb http://deb.odroid.in/c1/ trusty main
 deb http://deb.odroid.in/ trusty main
 _EOF_
-fi
 ;;esac
 
 if [ "${distro}" = "vivid" ] ; then
@@ -561,6 +558,7 @@ if [ "${distro}" = "vivid" ] ; then
     echo "deb $repo/ trusty main universe" >> $odir/etc/apt/sources.list
 fi
 
+fi
 
 # make necessary directories and copy some files
 mkdir -p $odir/etc/default > /dev/null 2>&1
@@ -573,17 +571,6 @@ mkdir -p $odir/usr/local/bin
 
 cp /etc/timezone $odir/etc
 cp wallpaper.png $odir/ > /dev/null 2>&1
-
-do_udev_update() {
-    mkdir -p $odir/etc/udev/rules.d > /dev/null 2>&1
-    echo "KERNEL==\"mali\",SUBSYSTEM==\"misc\",MODE=\"0777\",GROUP=\"video\"" > $odir/etc/udev/rules.d/10-odroid_mali.rules
-    echo "KERNEL==\"ump\",SUBSYSTEM==\"ump\",MODE=\"0777\",GROUP=\"video\"" >> $odir/etc/udev/rules.d/10-odroid_mali.rules
-    echo "KERNEL==\"ttySAC0\", SYMLINK+=\"ttyACM99\"" > $odir/etc/udev/rules.d/10-odroid-shield.rules
-    echo "KERNEL==\"fb1\", SYMLINK+=\"fb6\"" > $odir/etc/udev/rules.d/50-odroid-hdmi.rules
-    echo "KERNEL==\"CEC\", MODE=\"0777\"" > $odir/etc/udev/rules.d/60-odroid-cec.rules
-    echo "KERNEL==\"amstream*\",SUBSYSTEM==\"amstream-dev\",MODE=\"0666\",GROUP=\"video\"" > $odir/etc/udev/rules.d/10-odroid_am.rules
-    echo "KERNEL==\"amvideo*\",SUBSYSTEM==\"video\",MODE=\"0666\",GROUP=\"video\"" >> $odir/etc/udev/rules.d/10-odroid_am.rules
-}
 
 #*********************
 # ** CONFIGURE NETWORK
@@ -628,8 +615,13 @@ max_num_sta=8
 
 _EOF_
 
-echo "interface=wlan0" >> /etc/dnsmasq.conf
-echo "dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h" >> /etc/dnsmasq.conf
+cat >> $odir/etc/dnsmasq.conf << _EOF_
+
+interface=wlan0
+dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h
+
+_EOF_
+
 }
 
 
@@ -654,12 +646,19 @@ cat > $odir/etc/rc.local << _EOF_
 #
 # By default this script does nothing.
 
+_EOF_
+
+if [ "${BOARD}" = "C1" ] ; then
+cat >> $odir/etc/rc.local << _EOF_
 echo 0 > /sys/devices/platform/mesonfb/graphics/fb1/blank
 # ** Limit ethernet speed
 #ethtool -s eth0 speed 100 duplex full
 # ** Overclock to 1.728 GHz
 echo 1728000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+_EOF_
+fi
 
+cat >> $odir/etc/rc.local << _EOF_
 if [ -f /first_boot ] ; then
 	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
@@ -679,12 +678,6 @@ _EOF_
 
 # *****************************
 # Setup tmux to show the cursor
-cat > $odir/root/.tmux.conf << _EOF_
-setw -ga terminal-overrides ',*:Cc=\E[?120;%p1%s;240c:Cr=\E[?120;0;240c:civis=\E[?25l:cnorm=\E[?25h:cvvis=\E[?25h,'
-set -g status-bg black
-set -g status-fg white
-_EOF_
-
 cat > $odir/home/$USER/.tmux.conf << _EOF_
 setw -ga terminal-overrides ',*:Cc=\E[?120;%p1%s;240c:Cr=\E[?120;0;240c:civis=\E[?25l:cnorm=\E[?25h:cvvis=\E[?25h,'
 set -g status-bg black
@@ -694,15 +687,6 @@ _EOF_
 
 # ******************************************
 # ADJUST .bashrc to start tmux in fb console
-cat >> $odir/root/.bashrc << _EOF_
-
-if [ "\$TERM" = "linux" ]; then
-  if [[ ! \$TERM =~ screen ]]; then
-      exec tmux
-  fi
-fi
-_EOF_
-
 cat >> $odir/home/$USER/.bashrc << _EOF_
 
 if [ "\$TERM" = "linux" ]; then
@@ -728,16 +712,29 @@ stop on runlevel [!12345]
 respawn
 exec /sbin/getty -L 115200 ttyS0 vt102
 _EOF_
+
+elif [ "${BOARD}" = "U3" ] ; then
+
+cat > $odir/etc/init/ttySAC0.conf << _EOF_
+# ttyS0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc or RUNLEVEL=[12345]
+stop on runlevel [!12345]
+
+respawn
+exec /sbin/getty -L 115200 ttySAC0 vt102
+_EOF_
+
+fi
+
 rm $odir/etc/init/tty4.conf
 rm $odir/etc/init/tty5.conf
 rm $odir/etc/init/tty6.conf
-fi
 
 }
-
-if [ "${BOARD}" = "C1" ] ; then
-do_udev_update
-fi
 
 set_network
 do_tricks
@@ -746,27 +743,34 @@ if [ "${BOARD}" = "C1" ] ; then
     cp ./chroot_script_c1 $odir/chroot_script_c1
     chroot $odir /bin/bash /chroot_script_c1
     rm $odir/chroot_script_c1
+elif [ "${BOARD}" = "U3" ] ; then
+    cp ./odroid/armsoc_drv.tar.xz $odir
+    cp ./odroid/mali.tar.xz $odir
+    cp ./chroot_script_u3 $odir/chroot_script_u3
+    chroot $odir /bin/bash /chroot_script_u3
+    rm $odir/chroot_script_u3
 fi
 
 if [ "${BOARD}" = "C1" ] ; then
-    cp -r mali_ddx $odir/usr/local/bin
-    # Copy boot files
-    if [ ! "${_boot_on_ext4}" = "yes" ] ; then
-        mv $odir/media/boot/* $bootdir
-        cp $odir/boot/* $bootdir
-        cp $bootdir/uInitrd $odir/boot
-        cp $bootdir/boot.ini $odir/boot > /dev/null 2>&1
-    fi
-
-    # Test
-    if [ ! -f $odir/boot/uInitrd ]; then
-        echo "============================="
-        echo "WARNING: uInird NOT CREATED !"
-        echo "============================="
-        #exit 0
-    fi
-    sync
+    cp -r odroid/mali_ddx $odir/usr/local/bin
 fi
+
+# Copy boot files
+if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+    mv $odir/media/boot/* $bootdir
+    cp $odir/boot/* $bootdir
+    cp $bootdir/uInitrd $odir/boot
+    cp $bootdir/boot.ini $odir/boot > /dev/null 2>&1
+fi
+
+# Test
+if [ ! -f $odir/boot/uInitrd ]; then
+    echo "============================="
+    echo "WARNING: uInird NOT CREATED !"
+    echo "============================="
+    #exit 0
+fi
+sync
 
 rm -rf $odir/dev/*
 rm -rf $odir/proc/*

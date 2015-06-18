@@ -1,0 +1,168 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+export BOARD="odroidu2"
+
+# Kernel update constants.
+KTMP="/tmp/kupdate"
+
+BOOT_SCR_UBUNTU="http://builder.mdrjr.net/tools/boot.scr_ubuntu.tar"
+
+# Firmware
+FIRMWARE_URL="http://builder.mdrjr.net/tools/firmware.tar.xz"
+
+# Kernel builds
+export K_PKG_URL="http://builder.mdrjr.net/kernel-3.8/00-LATEST"
+
+DATE=`date +%Y.%m.%d-%H.%M`
+
+download_kernel() {
+    echo "Start to download kernel ..."
+    axel -q -n 5 $K_PKG_URL/$BOARD.tar.xz 2>&1 -o $KTMP/$BOARD.tar.xz
+}
+
+kernel_update() {
+	rm -rf $KTMP
+	mkdir -p $KTMP
+	cd $KTMP
+    echo ""
+	echo "*** Installing new kernel. Please way. "
+    echo ""
+	export klog=/root/kernel_update-log-$DATE.txt
+	
+    download_kernel
+
+	xz -d $BOARD.tar.xz &>> $klog
+	tar xf $BOARD.tar &>> $klog
+
+	cp -aRP boot/zImage /boot/zImage &>> $klog
+	cp -aRP lib/modules/* /lib/modules &>> $klog
+
+	#if [ -f /etc/initramfs-tools/initramfs.conf ]; then
+	#	cat /etc/initramfs-tools/initramfs.conf | sed s/"MODULES=most"/"MODULES=dep"/g > /tmp/a.conf
+	#	mv /tmp/a.conf /etc/initramfs-tools/initramfs.conf
+	#fi
+
+    export K_VERSION=`ls $KTMP/boot/config-* | sed s/"-"/" "/g | awk '{printf $2}'`
+    cp $KTMP/boot/config-* /boot
+    update-initramfs -c -k $K_VERSION &>> $klog
+    mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n "uInitrd $K_VERSION" -d /boot/initrd.img-$K_VERSION /boot/uInitrd-$K_VERSION &>> $klog
+    cp /boot/uInitrd-$K_VERSION /boot/uInitrd 
+    
+    cd /tmp
+	rm -fr $KTMP
+
+    echo "*** Update kernel done ***"
+    echo "Log file in : $klog"
+    echo ""
+}
+
+firmware_update() {
+	
+    echo ""
+    echo "*** Start to update Linux Firmware ***"
+    echo ""
+	rm -rf $KTMP
+	mkdir -p $KTMP
+	cd $KTMP
+    echo "Start to download firmware ..."
+	axel -q -n 5 $FIRMWARE_URL 2>&1 -o $KTMP/firmware.tar.xz
+	echo "Updating the firmware"
+	xz -d firmware.tar.xz
+	(cd /lib/firmware && tar xf $KTMP/firmware.tar)
+	echo "Firmware-UPDATE: Done. "
+    echo ""
+    cd /tmp
+	rm -fr $KTMP
+}
+
+bootscript_update() {
+
+    echo ""
+    echo "*** Start to update bootscript ***"
+    echo ""
+
+	rm -fr $KTMP
+	mkdir -p $KTMP
+	cd $KTMP
+
+    wget $BOOT_SCR_UBUNTU -O $KTMP/prime.tar
+    tar xf prime.tar
+    cp $KTMP/x2u2/*.scr /boot
+
+    cd /tmp
+	rm -fr $KTMP
+
+    echo "bootscript-UPDATE: done "
+    echo ""
+}
+
+udev_update() {
+
+    echo ""
+    echo "*** Start to update udev rules ***"
+    echo ""
+
+    echo "KERNEL==\"mali\",SUBSYSTEM==\"misc\",MODE=\"0777\"" > /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"mali0\",SUBSYSTEM==\"misc\",MODE=\"0777\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"ump\",SUBSYSTEM==\"ump\",MODE=\"0777\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"ttySAC0\", SYMLINK+=\"ttyACM99\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"event*\", SUBSYSTEM==\"input\", MODE=\"0777\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"CEC\", MODE=\"0777\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"amvideo\", MODE=\"0666\"" >> /etc/udev/rules.d/10-odroid.rules
+    echo "KERNEL==\"amstream*\", MODE=\"0666\"" >> /etc/udev/rules.d/10-odroid.rules
+	
+	echo "UDEV-UPDATE: done "
+    echo ""
+
+}
+
+armsoc_rebuild() { 
+	
+	buildlog=/root/armsoc-update-$DATE.txt
+	
+    echo ""
+    echo "*** Start to update armsoc ***"
+    echo ""
+	rm -fr $KTMP
+	mkdir -p $KTMP
+	cd $KTMP
+	
+	# Install dependencies.
+	apt-get -y install xserver-xorg-video-armsoc
+	
+    # Unpack
+    echo "Unpack mali ..."
+    mkdir -p $KTMP/mali
+    cd $KTMP/mali
+	tar xJf /mali.tar.xz &>> $buildlog
+	cp -aRP ./* /usr/lib
+	cp -aRP ./* /usr/lib/arm-linux-gnueabihf/mali-egl
+    cd $KTMP
+
+    echo "Unpack armsoc ..."
+    mkdir -p $KTMP/armsoc
+    cd $KTMP/armsoc
+    tar xJf /armsoc_drv.tar.xz &>> $buildlog
+    cp -aRP ./* /usr/lib/xorg/modules/drivers/
+	
+	ldconfig
+	#cp config/xorg.conf /etc/X11/xorg.conf
+	
+	sync
+	
+    rm /*.tar.xz
+
+    cd /tmp
+	rm -fr $KTMP
+
+	echo "Mali is now updated. If something fails or isn't working report on the forums with the following file: $buildlog"
+}
+
+apt-get -y -q install axel unzip xz-utils
+
+kernel_update
+bootscript_update
+firmware_update
+udev_update
+armsoc_rebuild

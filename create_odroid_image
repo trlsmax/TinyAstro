@@ -55,15 +55,20 @@ _format="ext4"
 # set  _boot_on_ext4="yes"  and                       =
 # FAT partitin won't be created                       =
 # =====================================================
-_boot_on_ext4="yes"
+_boot_on_ext4=""
 
 
 # *****************************************************
 # SD Card partitions sizes in MB (1024 * 1024 bytes)  *
 # *****************************************************
-fatsize=32
+fatsize=64
 linuxsize=2560
 
+# *****************************************************
+# Set file systems uuid's for boot and fstab
+# *****************************************************
+vfatuuid="6E355356"
+ext4uuid="e139ce78-9841-40fe-8823-96a304a09859"
 
 # *****************************************************
 # Select ubuntu/debian distribution and repository    *
@@ -95,10 +100,10 @@ if [ "${BOARD}" = "C1" ]; then
     BL1="odroid/uboot/c1/bl1.bin.hardkernel"
     UBOOT="odroid/uboot/c1/u-boot.bin"
 else
-    BL1="odroid/uboot/u3/E4412_S.bl1.HardKernel.bin"
-    BL2="odroid/uboot/u3/bl2.signed.bin"
-    UBOOT="odroid/uboot/u3/u-boot.bin"
-    TZSW="odroid/uboot/u3/E4412_S.tzsw.signed.bin"
+    BL1="odroid/uboot/u3/bl1.bin"
+    BL2="odroid/uboot/u3/bl2.bin"
+    UBOOT="odroid/uboot/u3/uboot.bin"
+    TZSW="odroid/uboot/u3/tzsw.bin"
 fi
 
 
@@ -315,12 +320,12 @@ if [ ! "${sdcard}" = "" ]; then
     echo ""
     if [ ! "${_boot_on_ext4}" = "yes" ] ; then
         echo "Formating fat partition ..."
-	mkfs -t vfat -n BOOT ${sdcard}1 > /dev/null 2>&1
+	mkfs -t vfat -n BOOT -i $vfatuuid ${sdcard}1 > /dev/null 2>&1
 	if [ $? -ne 0 ]; then
 		echo "ERROR formating fat partition."
 		exit 0
 	fi
-        vfatuuid=`blkid -s UUID -o value ${sdcard}1`
+        #vfatuuid=`blkid -s UUID -o value ${sdcard}1`
 	echo "  fat partition formated."
         echo "Formating linux partition, please wait ..."
 	if [ "${_format}" = "btrfs" ] ; then
@@ -331,7 +336,7 @@ if [ ! "${sdcard}" = "" ]; then
 		exit 1
 	    fi
 	else
-	    mkfs -F -t ext4 -L $distro ${sdcard}2 > /dev/null 2>&1
+	    mkfs -F -t ext4 -L $distro -U $ext4uuid ${sdcard}2 > /dev/null 2>&1
 	    if [ $? -ne 0 ]; then
 		    echo "ERROR formating ext4 partition."
 		    exit 1
@@ -347,7 +352,7 @@ if [ ! "${sdcard}" = "" ]; then
 	    #	exit 0
 	    #fi
 	fi
-        ext4uuid=`blkid -s UUID -o value ${sdcard}2`
+        #ext4uuid=`blkid -s UUID -o value ${sdcard}2`
     else
 	echo "Formating linux partition, please wait ..."
 	if [ "${_format}" = "btrfs" ] ; then
@@ -358,7 +363,7 @@ if [ ! "${sdcard}" = "" ]; then
 		exit 1
 	    fi
 	else    
-	    mkfs -F -t ext4 -L $distro ${sdcard}1 > /dev/null 2>&1
+	    mkfs -F -t ext4 -L $distro -U $ext4uuid ${sdcard}1 > /dev/null 2>&1
 	    if [ $? -ne 0 ]; then
 		    echo "ERROR formating ext4 partition."
 		    exit 0
@@ -374,7 +379,7 @@ if [ ! "${sdcard}" = "" ]; then
 	    #	exit 0
 	    #fi
 	fi
-        ext4uuid=`blkid -s UUID -o value ${sdcard}1`
+        #ext4uuid=`blkid -s UUID -o value ${sdcard}1`
     fi
     echo "  linux partition formated."
 
@@ -397,22 +402,22 @@ if [ ! "${sdcard}" = "" ]; then
         exit 0
         fi
     elif [ "${BOARD}" = "U3" ]; then
-        dd iflag=dsync oflag=dsync if=$BL1 of=${sdcard} seek=1 > /dev/null 2>&1
+        dd if=$BL1 of=${sdcard} bs=512 conv=notrunc seek=1 > /dev/null 2>&1
         if [ $? -ne 0 ]; then
         echo "ERROR installing u-boot."
         exit 0
         fi
-        dd iflag=dsync oflag=dsync if=$BL2 of=${sdcard} seek=31 > /dev/null 2>&1
+        dd if=$BL2 of=${sdcard} bs=512 conv=notrunc seek=31 > /dev/null 2>&1
         if [ $? -ne 0 ]; then
         echo "ERROR installing u-boot."
         exit 0
         fi
-        dd iflag=dsync oflag=dsync if=$UBOOT of=${sdcard} seek=63 > /dev/null 2>&1
+        dd if=$UBOOT of=${sdcard} bs=512 conv=notrunc seek=63 > /dev/null 2>&1
         if [ $? -ne 0 ]; then
         echo "ERROR installing u-boot."
         exit 0
         fi
-        dd iflag=dsync oflag=dsync if=$TZSW of=${sdcard} seek=2111 > /dev/null 2>&1
+        dd if=$TZSW of=${sdcard} bs=512 conv=notrunc seek=2111 > /dev/null 2>&1
         if [ $? -ne 0 ]; then
         echo "ERROR installing u-boot."
         exit 0
@@ -579,6 +584,9 @@ set_network() {
 mkdir -p $odir/etc/network
 cat >> $odir/etc/network/interfaces << _EOF_
 
+auto lo
+iface lo inet loopback
+
 auto eth0
 iface eth0 inet dhcp
 
@@ -715,7 +723,7 @@ _EOF_
 
 elif [ "${BOARD}" = "U3" ] ; then
 
-cat > $odir/etc/init/ttySAC0.conf << _EOF_
+cat > $odir/etc/init/ttySAC1.conf << _EOF_
 # ttyS0 - getty
 #
 # This service maintains a getty on ttyS0 from the point the system is
@@ -725,7 +733,7 @@ start on stopped rc or RUNLEVEL=[12345]
 stop on runlevel [!12345]
 
 respawn
-exec /sbin/getty -L 115200 ttySAC0 vt102
+exec /sbin/getty -L 115200 ttySAC1 vt102
 _EOF_
 
 fi
@@ -794,7 +802,7 @@ else
     echo "UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime  0 1" >> $odir/etc/fstab
 fi
 if [ ! "${_boot_on_ext4}" = "yes" ] ; then
-    echo "UUID=${vfatuuid}  /media/boot  vfat  defaults,rw,owner,flush,umask=000  0 0" >> $odir/etc/fstab
+    echo "/dev/mmcblk0p1  /media/boot  vfat  defaults,rw,owner,flush,umask=000  0 0" >> $odir/etc/fstab
 fi
 echo "tmpfs /tmp  tmpfs nodev,nosuid,mode=1777  0 0" >> $odir/etc/fstab
 
@@ -951,12 +959,12 @@ echo "************************************************************"
 echo "Instalation finished."
 echo ""
 if [ ! "${sdcard}" = "" ]; then
-    echo "You have bootable Odroid-C1 SD Card image \"${sdcard}\"."
+    echo "You have bootable Odroid-${BOARD} SD Card image \"${sdcard}\"."
     echo "Use dd to copy to your SDCard"
     echo "  e.g. sudo dd if=$sdcard of=/dev/<your_sdcard> bs=1M"
 else
     if [ "${_directsd}" = "yes" ] ; then
-        echo "You have Odroid-C1 $distro instalation on $image_name."
+        echo "You have Odroid-${BOARD} $distro instalation on $image_name."
     else
 	if [ ! "${_boot_on_ext4}" = "yes" ] ; then
 	    echo "Copy files from $bootdir to SD Card boot partition"
@@ -980,31 +988,6 @@ else
     fi
     echo "  chroot $odir /usr/bin/qemu-arm-static -cpu cortex-a9 /bin/bash"
 fi
-echo ""
-echo "************************************************************"
-echo "* AFTER BOOTING:                                           *"
-echo "* -------------------------------------------------------- *"
-echo "* To resize linux partition to fill sd card run:           *"
-echo "*   sudo fs_resize                                         *"
-echo "* -------------------------------------------------------- *"
-echo "* To install desktop run:                                  *"
-echo "*   sudo install_desktop                                   *"
-echo "*   or, for minimal lxde                                   *"
-echo "*   sudo install_mini_desktop                              *"
-echo "*   DON'T FORGET TO RESIZE SD CARD IF NECESSARY            *"
-echo "*   AND ENABLE VIDEO MEMORY IN \"boot.ini\"                  *"
-echo "* -------------------------------------------------------- *"
-echo "* To configure your local settings use:                    *"
-echo "*   sudo dpkg-reconfigure tzdata                           *"
-echo "*   sudo dpkg-reconfigure keyboard-configuration           *"
-echo "*   sudo dpkg-reconfigure locales                          *"
-echo "*   sudo dpkg-reconfigure console-setup                    *"
-echo "*     #change your system's locale entries by modifying    *"
-echo "*     #the file /etc/default/locale (e.g. en_US.UTF-8)     *"
-echo "*   sudo locale-gen <your_locale> (e.g en_US.UTF-8)        *"
-echo "*   sudo dpkg-reconfigure locales                          *"
-echo "************************************************************"
-echo ""
 echo ""
 
 exit 0

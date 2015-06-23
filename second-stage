@@ -216,6 +216,8 @@ mv /home/kstarsrc /home/astro/.config/
 
 chown -R $USER:$USER /home/$USER
 
+chmod +x /usr/sbin/hostapd_rtl
+
 echo ""
 echo "Instalation finished."
 echo ""

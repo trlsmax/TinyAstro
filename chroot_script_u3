@@ -129,7 +129,7 @@ armsoc_rebuild() {
 	cd $KTMP
 	
 	# Install dependencies.
-	apt-get -y install xserver-xorg-video-armsoc
+	#apt-get -y install xserver-xorg-video-armsoc
 	
     # Unpack
     echo "Unpack mali ..."
@@ -137,6 +137,8 @@ armsoc_rebuild() {
     cd $KTMP/mali
 	tar xJf /mali.tar.xz &>> $buildlog
 	cp -aRP ./* /usr/lib
+    rm -rf /usr/lib/arm-linux-gnueabihf/mesa-*
+    mkdir -p /usr/lib/arm-linux-gnueabihf/mali_egl
 	cp -aRP ./* /usr/lib/arm-linux-gnueabihf/mali-egl
     cd $KTMP
 
@@ -145,7 +147,7 @@ armsoc_rebuild() {
     cd $KTMP/armsoc
     tar xJf /armsoc_drv.tar.xz &>> $buildlog
     cp -aRP ./* /usr/lib/xorg/modules/drivers/
-	
+
 	ldconfig
 	#cp config/xorg.conf /etc/X11/xorg.conf
 	
@@ -165,4 +167,4 @@ kernel_update
 bootscript_update
 firmware_update
 udev_update
-armsoc_rebuild
+#armsoc_rebuild

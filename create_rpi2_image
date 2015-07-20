@@ -1,0 +1,719 @@
+#!/bin/bash
+
+# Last update: 2015-03-12
+# *****************************************************
+# !! REMEMBER TO SET PARAMETERS IN FILE "second-stage *
+# *****************************************************
+
+if [ "$(id -u)" != "0" ]; then
+   echo "Script must be run as root !"
+   exit 0
+fi
+
+echo ""
+date
+echo "Creating TinyAstro image for RaspBerry Pi 2"
+echo "========================================================"
+echo ""
+
+_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $_DIR
+
+# =====================================================
+# ==== P A R A M E T E R S ============================
+# =====================================================
+
+# *****************************************************
+# Set the base name of your image.                    *
+# Distro name is automaticaty appended                *
+# --------------------------------------------------- *
+# IF image_name="", image file won't be created,      *
+# instalation will be created in local directories    *
+# linux-$distro & boot-$distro                        *
+# YOU CAN CREATE THE IMAGE LATER RUNNING:             *
+# sudo ./image_from_dir <directory> [yes|no]          *
+#      yes|no - create or not ext4 only system        *
+# --------------------------------------------------- *
+# IF image_name is BLOCK DEVICE (/dev/sdX)            *
+# LINUX filesystem will be created directly on it     *
+# Partition must exist !                              *
+# IF _format="" partition will NOT be formated        *
+# otherwyse it will be formated with specified format *
+# *****************************************************
+image_name="TinyAstro"
+
+
+# *****************************************************
+# Filesystem type for linux partition                 *
+# *****************************************************
+#_format="btrfs"
+_format="ext4"
+
+# =====================================================
+# IF YOU WANT TO HAVE BOOT FILES ON EXT4 PARTITION    =
+# AND NOT ON SEPARATE FAT16 PARTITION                 =
+# set  _boot_on_ext4="yes"  and                       =
+# FAT partitin won't be created                       =
+# =====================================================
+_boot_on_ext4=""
+
+
+# *****************************************************
+# SD Card partitions sizes in MB (1024 * 1024 bytes)  *
+# *****************************************************
+fatsize=64
+linuxsize=2560
+
+# *****************************************************
+# Set file systems uuid's for boot and fstab
+# *****************************************************
+vfatuuid="6E355356"
+ext4uuid="e139ce78-9841-40fe-8823-96a304a09859"
+
+# ******************************************************
+# If you want to xz compress the image and make md5sum *
+# set  _compress="yes"                                 *
+# ******************************************************
+_compress="no"
+
+# *****************************************************
+# Select ubuntu/debian distribution and repository    *
+# SELECT ONLY ONE distro AND ONE repo                 *
+# *****************************************************
+
+# === Ubuntu ===
+#distro="precise"
+#distro="trusty"
+#distro="utopic"
+distro="vivid"
+repo="http://ports.ubuntu.com/ubuntu-ports"
+
+# ******************************************************
+# Which board you want to build the image              *
+# ******************************************************
+BOARD=RPi2
+
+# ^^^^ P A R A M E T E R S ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+if [ "${_format}" = "btrfs" ]; then
+    _boot_on_ext4="no"
+fi
+
+#whre is the rootfs
+rfs=./rfs
+
+# === CHECK DESTINATION ============================================
+if [ ! "${image_name}" = "" ]; then
+    if [ -b $image_name ] && [ "${_boot_on_ext4}" = "yes" ]; then
+        # === ON BLOCK DEVICE ======================================
+	echo "Creating filesystem on block device ${image_name} for ${BOARD}..."
+        sdcard=""
+	odir="_mnt"
+	bootdir="boot-$distro-sd"
+	_boot_on_ext4="yes"
+	_directsd="yes"
+	# ==========================================================
+    else
+        # === ON IMAGE FILE ======================
+	if [ "${_boot_on_ext4}" = "yes" ] ; then
+	    sdcard="$image_name-$distro-$BOARD-nofat.img"
+	else
+	    sdcard="$image_name-$distro-$BOARD.img"
+	fi
+	odir="linux-$image_name-$distro-$BOARD"
+	bootdir="$odir/boot/firmware"
+	# ========================================
+    fi
+else
+    # === IN LOCAL DIRECTORY ===
+    sdcard=""
+    odir="linux-$distro"
+    bootdir="boot-$distro"
+    vfatuuid="6E35-5356"
+    ext4uuid="e139ce78-9841-40fe-8823-96a304a09859"
+    # ==========================
+fi
+# ==================================================================
+
+
+_excode=0
+
+# **** show progress *******
+proc_wait() {
+    spin='-\|/'
+
+    i=0
+    while kill -0 $1 2>/dev/null
+    do
+      i=$(( (i+1) %4 ))
+      printf "\r$2 ${spin:$i:1}"
+      sleep .1
+    done
+    _excode=$?
+
+    if [ $_excode -eq 0 ]
+    then
+      printf "\rOK.                        \n"
+    else
+      printf "\rERROR.                     \n"
+    fi
+}
+# **************************
+
+if [ "${_format}" = "btrfs" ] ; then
+    _mntopt="-o compress-force=lzo"
+else
+    _mntopt="-o loop"
+fi
+
+# ======================================================================
+# IF CREATING ON IMMAGE, PREPARE SD CARD IMAGE FOR ODROID - UBUNTU BOOT
+# ----------------------------------------------------------------------
+if [ ! "${sdcard}" = "" ]; then
+
+    echo "Using disk image \"$sdcard\""
+
+    # remove old image files
+    rm ${sdcard} > /dev/null 2>&1
+    rm ${sdcard}1 > /dev/null 2>&1
+    rm ${sdcard}2 > /dev/null 2>&1
+    if [ "${_compress}" = "yes" ]; then
+        rm ${sdcard}.md5sum > /dev/null 2>&1
+        rm ${sdcard}.xz > /dev/null 2>&1
+        rm ${sdcard}.xz.md5sum > /dev/null 2>&1
+    fi
+
+    if [ $linuxsize -eq 0 ]; then
+	linuxsize=2560
+    fi
+
+    if [ "${_boot_on_ext4}" = "yes" ] ; then
+        _ersz=$(expr $linuxsize + 2)
+    else
+        _ersz=$(expr $fatsize + $linuxsize + 2)
+    fi
+
+    echo "Creating bootable SD card image $sdcard, please wait ..."
+    echo ""
+    dd if=/dev/zero of=${sdcard} bs=1M count=$_ersz > /dev/null 2>&1
+    echo "Creating partition images, please wait ..."
+    if [ "${_boot_on_ext4}" = "yes" ] ; then
+        dd if=/dev/zero of=${sdcard}1 bs=1M count=$linuxsize > /dev/null 2>&1
+    else
+		dd if=/dev/zero of=${sdcard}1 bs=1M count=$fatsize > /dev/null 2>&1
+        dd if=/dev/zero of=${sdcard}2 bs=1M count=$linuxsize > /dev/null 2>&1
+    fi
+    sync
+    sleep 2
+
+    # Create msdos partition table
+    echo ""
+    echo "Creating new filesystem on $sdcard..."
+    echo -e "o\nw" | fdisk ${sdcard} > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+		echo "ERROR."
+		exit 0
+    fi
+    sync
+    echo "  New filesystem created on SD card."
+
+    echo ""
+    echo "Partitioning SD card $sdcard..."
+
+    if [ "${_boot_on_ext4}" = "yes" ] ; then
+		echo "  Creating ext4"
+		sext4=3072
+		if [ $linuxsize == 0 ]; then
+			eext4=""
+		else
+			eext4=$(expr $linuxsize \* 1024 \* 1024 / 512 + $sext4 - 1)
+		fi
+		echo -e "n\np\n1\n$sext4\n$eext4\nt\n83\nw" | fdisk ${sdcard} > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "ERROR."
+			exit 0
+		fi
+    else
+		sfat=2048
+		efat=$(expr $fatsize \* 1024 \* 1024 / 512 + $sfat - 1)
+		echo "  Creating fat & ext4"
+		sext4=$(expr $efat + 1)
+		if [ $linuxsize == 0 ]; then
+			eext4=""
+		else
+			eext4=$(expr $linuxsize \* 1024 \* 1024 / 512 + $sext4 - 1)
+		fi
+		echo -e "n\np\n1\n$sfat\n$efat\nn\np\n2\n$sext4\n$eext4\nt\n1\n6\nt\n2\n83\nw" | fdisk ${sdcard} > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "ERROR."
+			exit 0
+		fi
+    fi
+    echo "  OK."
+    sync
+    sleep 2
+    #echo -e "p\nq\n" | fdisk ${sdcard}
+
+    echo ""
+    if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+        echo "Formating fat partition ..."
+	mkfs -t vfat -n BOOT -i $vfatuuid ${sdcard}1 > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		echo "ERROR formating fat partition."
+		exit 0
+	fi
+        #vfatuuid=`blkid -s UUID -o value ${sdcard}1`
+	echo "  fat partition formated."
+        echo "Formating linux partition, please wait ..."
+	if [ "${_format}" = "btrfs" ] ; then
+	    # format as btrfs
+	    mkfs.btrfs -f -L $distro ${sdcard}2 > /dev/null 2>&1
+	    if [ $? -ne 0 ]; then
+		echo "ERROR formating btrfs partition."
+		exit 1
+	    fi
+	else
+	    mkfs -F -t ext4 -L $distro -U $ext4uuid ${sdcard}2 > /dev/null 2>&1
+	    if [ $? -ne 0 ]; then
+		    echo "ERROR formating ext4 partition."
+		    exit 1
+	    fi
+	    #tune2fs -o journal_data_writeback ${sdcard}2 > /dev/null 2>&1
+	    #if [ $? -ne 0 ]; then
+	    #	echo "ERROR tuning ext4 partition."
+	    #	exit 0
+	    #fi
+	    #tune2fs -O ^has_journal ${sdcard}2 > /dev/null 2>&1
+	    #if [ $? -ne 0 ]; then
+	    #	echo "ERROR tuning ext4 partition."
+	    #	exit 0
+	    #fi
+	fi
+        #ext4uuid=`blkid -s UUID -o value ${sdcard}2`
+    else
+	echo "Formating linux partition, please wait ..."
+	if [ "${_format}" = "btrfs" ] ; then
+	    # format as btrfs
+	    mkfs.btrfs -f -L $distro ${sdcard}2 > /dev/null 2>&1
+	    if [ $? -ne 0 ]; then
+		echo "ERROR formating btrfs partition."
+		exit 1
+	    fi
+	else    
+	    mkfs -F -t ext4 -L $distro -U $ext4uuid ${sdcard}1 > /dev/null 2>&1
+	    if [ $? -ne 0 ]; then
+		    echo "ERROR formating ext4 partition."
+		    exit 0
+	    fi
+	    #tune2fs -o journal_data_writeback ${sdcard}1 > /dev/null 2>&1
+	    #if [ $? -ne 0 ]; then
+	    #	echo "ERROR tuning ext4 partition."
+	    #	exit 0
+	    #fi
+	    #tune2fs -O ^has_journal ${sdcard}1 > /dev/null 2>&1
+	    #if [ $? -ne 0 ]; then
+	    #	echo "ERROR tuning ext4 partition."
+	    #	exit 0
+	    #fi
+	fi
+        #ext4uuid=`blkid -s UUID -o value ${sdcard}1`
+    fi
+    echo "  linux partition formated."
+    dd if=${sdcard} of=${sdcard}u bs=512 count=2048 > /dev/null 2>&1
+    rm ${sdcard}
+else
+    echo "Creating root filesistem in local directory $odir..."
+fi
+# ======================================================================
+
+
+
+# Prepare directories
+if [ ! -d $odir ]; then
+    mkdir -p $odir
+fi
+
+sync
+
+# =============================================
+# IF USING PHISICAL PARTITION, FORMAT AND MOUNT
+# =============================================
+if [ "${_directsd}" = "yes" ] ; then
+    umount $image_name > /dev/null 2>&1
+    if [ "${_format}" = "ext4" ] ; then
+        # ** formating as ext4
+	if ! mkfs.ext4 -F -L linux_e ${image_name} > /dev/null 2>&1; then
+	  echo "ERROR formating $image_name."
+	  exit 1
+	fi
+        partprobe -s ${image_name} > /dev/null 2>&1
+    fi
+    if [ "${_format}" = "btrfs" ] ; then
+        # format as btrfs
+	if ! mkfs.btrfs -f -L linux_b ${image_name} > /dev/null 2>&1; then
+	  echo "ERROR formating $image_name."
+	  exit 1
+	fi
+        partprobe -s ${image_name} > /dev/null 2>&1
+	if ! mount -o compress=lzo $image_name $odir; then
+	    echo "ERROR mounting $image_name."
+	    exit 1
+	fi
+    else
+        # do not format, only mount
+	if ! mount $image_name $odir; then
+	    echo "ERROR mounting $image_name."
+	    exit 1
+	fi
+    fi
+    ext4uuid=`blkid -s UUID -o value ${image_name}`
+    echo "${image_name} mounted to ${odir}."
+    rm -rf $odir/* > /dev/null 2>&1
+    sync
+else
+    umount $odir > /dev/null 2>&1
+    sleep 1
+fi
+
+# ===========================================
+# IF USING SD CARD OR IMAGE, MOUNT PARTITIONS
+# ===========================================
+if [ ! "${sdcard}" = "" ]; then
+    echo ""
+    echo "Mounting SD Card partitions..."
+
+    if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+	if ! mount ${_mntopt} ${sdcard}2 $odir; then
+	    echo "ERROR mounting partitions..."
+	    umount $bootdir
+	    exit 1
+	fi
+
+    if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+        if [ ! -d $bootdir ]; then
+        mkdir -p $bootdir
+        fi
+        rm $bootdir/* > /dev/null 2>&1
+        sync
+        umount $bootdir > /dev/null 2>&1
+    fi
+
+	if ! mount ${sdcard}1 $bootdir; then
+	    echo "ERROR mounting partitions..."
+	    exit 1
+	fi
+        echo "SD Card partitions mounted to $odir & $bootdir"
+    else
+	if ! mount ${_mntopt} ${sdcard}1 $odir; then
+	    echo "ERROR mounting partitions..."
+            if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+	        umount $bootdir
+	    fi
+	    exit 1
+	fi
+    fi
+    echo "SD Card partition mounted to $odir"
+fi
+
+#===================================================================================================================
+# =========================
+# DEBOOTSTRAP UBUNTU DISTRO
+# =========================
+echo ""
+
+if [ ! -d $rfs ] ; then
+    echo "No rfs found, please create rfs first."
+    exit 0
+fi
+
+echo "Copy rootfs from $rfs to $odir ......"
+rsync -r -t -p -o -g -x --delete -l -H -D --numeric-ids -s --stats $rfs/* $odir/
+pid=$!
+proc_wait $pid "please wait"
+if [ $_excode -ne 0 ]; then
+    echo "ERROR IN COPY FILE!"
+    exit 0
+fi
+
+# make necessary directories and copy some files
+mkdir -p $odir/etc/default > /dev/null 2>&1
+if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+    mkdir -p $odir/boot/firmware
+fi
+mkdir -p $odir/usr/local/bin
+
+
+cp /etc/timezone $odir/etc
+cp wallpaper.png $odir/ > /dev/null 2>&1
+
+#*********************
+# ** CONFIGURE NETWORK
+#*********************
+set_network() {
+mkdir -p $odir/etc/network
+cat >> $odir/etc/network/interfaces << _EOF_
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+#WIFI AP
+allow-hotplug wlan0
+auto wlan0
+iface wlan0 inet static
+address 10.0.0.1
+netmask 255.255.255.0
+
+_EOF_
+
+cat >> $odir/etc/hostapd/ap.conf << _EOF_
+#ssid=TinyAstro
+wpa_passphrase=astronomy
+
+ctrl_interface=/var/run/hostapd
+interface=wlan0
+#bridge=br0
+driver=rtl871xdrv
+hw_mode=g
+channel=6
+wpa=2
+
+beacon_int=100
+hw_mode=g
+ieee80211n=1
+wme_enabled=1
+ht_capab=[SHORT-GI-20][SHORT-GI-40][HT40+]
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=CCMP
+max_num_sta=8
+#wpa_group_rekey=86400
+
+_EOF_
+
+cat >> $odir/etc/dnsmasq.conf << _EOF_
+
+interface=wlan0
+dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h
+
+_EOF_
+
+}
+
+
+# *************************************************
+# ** Some tricks to make everything work
+# *************************************************
+do_tricks() {
+
+# **********************************************
+# ADJUST rc.local for some tuning
+cat > $odir/etc/rc.local << _EOF_
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+if [ -f /first_boot ] ; then
+	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
+	rm -f /first_boot
+fi
+
+if [ -d /sys/class/net/wlan0 ] ; then
+	hostapd_rtl -B /etc/hostapd/ap.conf & > /dev/null 2>&1
+fi
+
+su astro -c "startx -- :1 -config xorg.dummy.conf &"
+su astro -c "x11vnc -display :1 -forever &"
+/home/astro/tools/ddserver &
+
+exit 0
+_EOF_
+
+# *****************************
+# Setup tmux to show the cursor
+cat > $odir/home/$USER/.tmux.conf << _EOF_
+setw -ga terminal-overrides ',*:Cc=\E[?120;%p1%s;240c:Cr=\E[?120;0;240c:civis=\E[?25l:cnorm=\E[?25h:cvvis=\E[?25h,'
+set -g status-bg black
+set -g status-fg white
+_EOF_
+
+
+# ******************************************
+# ADJUST .bashrc to start tmux in fb console
+cat >> $odir/home/$USER/.bashrc << _EOF_
+
+if [ "\$TERM" = "linux" ]; then
+  if [[ ! \$TERM =~ screen ]]; then
+      exec tmux
+  fi
+fi
+
+_EOF_
+
+# *********************************************
+# Enable serial console and 3 virtual terminals
+cat > $odir/etc/init/ttyAMA0.conf << _EOF_
+# ttyAMA0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc or RUNLEVEL=[12345]
+stop on runlevel [!12345]
+
+respawn
+exec /sbin/getty -L 115200 ttyAMA0 vt102
+_EOF_
+
+rm $odir/etc/init/tty4.conf
+rm $odir/etc/init/tty5.conf
+rm $odir/etc/init/tty6.conf
+
+}
+
+set_network
+do_tricks
+
+# Mount host system
+function mount_system() {
+    mount -t proc none $odir/proc
+    mount -t sysfs none $odir/sys
+    mount -o bind /dev $odir/dev
+    mount -o bind /dev/pts $odir/dev/pts
+}
+
+# Unmount host system
+function umount_system() {
+    umount -f $odir/dev/pts
+    umount -f $odir/proc
+    umount -f $odir/sys
+    umount -r $odir/dev
+}
+
+mount_system
+cp ./chroot_script_rpi2 $odir/chroot_script_rpi2
+chroot $odir /bin/bash /chroot_script_rpi2
+umount_system
+rm $odir/chroot_script_rpi2
+
+sync
+
+rm -rf $odir/dev/*
+rm -rf $odir/proc/*
+rm -rf $odir/run/*
+rm -rf $odir/sys/*
+rm -rf $odir/tmp/*
+touch $odir/first_boot
+
+echo ""
+
+# ***************
+# Create fstab
+# ***************
+echo "Creating \"fstab\""
+echo "# Odroid fstab" > $odir/etc/fstab
+echo "" >> $odir/etc/fstab
+if [ "${_format}" = "btrfs" ] ; then
+    echo "UUID=$ext4uuid  /  btrfs  noatime,nodiratime,compress=lzo  0 1" >> $odir/etc/fstab
+else
+#    echo "#UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime,data=writeback  0 1" >> $odir/etc/fstab
+    echo "UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime  0 1" >> $odir/etc/fstab
+fi
+if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+    echo "/dev/mmcblk0p1  /boot/firmware  vfat  defaults,rw,owner,flush,umask=000  0 0" >> $odir/etc/fstab
+fi
+echo "tmpfs /tmp  tmpfs nodev,nosuid,mode=1777  0 0" >> $odir/etc/fstab
+
+# IF CREATING IMAGE unmount and create final image
+if [ ! "${sdcard}" = "" ]; then
+    if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+      if ! umount $bootdir; then
+	  echo "ERROR unmounting fat partition."
+	  exit 0
+      fi
+      rm -rf $bootdir/* > /dev/null 2>&1
+      rmdir $bootdir > /dev/null 2>&1
+    fi
+    if ! umount $odir; then
+	echo "ERROR unmounting ext4 partitions."
+	exit 0
+    fi
+    rm -rf $odir/* > /dev/null 2>&1
+    rmdir $odir > /dev/null 2>&1
+    sync
+
+    echo "Creating SDCard image..."
+    dd if=${sdcard}u of=${sdcard} > /dev/null 2>&1
+    if [ -f ${sdcard}1 ]; then
+        dd if=${sdcard}1 of=${sdcard} bs=1M conv=notrunc oflag=append > /dev/null 2>&1
+    fi
+    if [ -f ${sdcard}2 ]; then
+        dd if=${sdcard}2 of=${sdcard} bs=1M conv=notrunc oflag=append > /dev/null 2>&1
+    fi
+
+    if [ "${_compress}" = "yes" ]; then
+        echo "Compressing image..."
+        xz -z -k -9 -f -v $sdcard
+        md5sum $sdcard > $sdcard.md5sum
+        md5sum $sdcard.xz > $sdcard.xz.md5sum
+    fi
+fi
+
+if [ "${_directsd}" = "yes" ] ; then
+    if ! umount $odir; then
+	echo "ERROR unmounting ext4 partitions."
+    fi
+fi
+
+echo ""
+date
+echo ""
+echo "************************************************************"
+echo "Instalation finished."
+echo ""
+if [ ! "${sdcard}" = "" ]; then
+    echo "You have bootable ${BOARD} SD Card image \"${sdcard}\"."
+    echo "Use dd to copy to your SDCard"
+    echo "  e.g. sudo dd if=$sdcard of=/dev/<your_sdcard> bs=1M"
+else
+    if [ "${_directsd}" = "yes" ] ; then
+        echo "You have ${BOARD} $distro instalation on $image_name."
+    else
+	if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+	    echo "Copy files from $bootdir to SD Card boot partition"
+	    echo "  e.g.  cp $bootdir/* <path_to_sdcard_boot_mount>"
+	    echo "  and rsync $odir to SD Card ext4 partition."
+	    echo "  e.g. sudo rsync -r -t -p -o -g -x -v --progress --delete -l -H -D --numeric-ids -s $PWD/$odir/ <path_to_sdcard_ext4_mount>/"
+	else
+	    echo "Rsync files from $odir to SD Card ext4 partition"
+	    echo "  e.g. sudo rsync -r -t -p -o -g -x -v --progress --delete -l -H -D --numeric-ids -s $PWD/$odir/ <path_to_sdcard_ext4_mount>/"
+	fi
+	echo "UPDATE \"/etc/fstab\" AND  \"boot.ini\" WITH SDCard PARTITIONS UUID's if necessary!"
+	echo ""
+	echo "Or create SDCard image running:"
+	echo "  sudo ./image_from_dir $odir [yes|no]"
+	echo "    yes|no - create or not ext4 only system"
+    fi
+    echo ""
+    echo "You can chroot into \"$odir\" to make additional changes:"
+    if [ "${_directsd}" = "yes" ] ; then
+        echo "  mount $image_name $odir"
+    fi
+    echo "  chroot $odir /usr/bin/qemu-arm-static -cpu cortex-a9 /bin/bash"
+fi
+echo ""
+
+exit 0

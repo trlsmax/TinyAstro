@@ -1,0 +1,161 @@
+#!/bin/sh
+export DEBIAN_FRONTEND=noninteractive
+
+# Install the RPi PPA
+cat <<"EOM" >/etc/apt/preferences.d/rpi2-ppa
+Package: *
+Pin: release o=LP-PPA-fo0bar-rpi2
+Pin-Priority: 990
+
+Package: *
+Pin: release o=LP-PPA-fo0bar-rpi2-staging
+Pin-Priority: 990
+EOM
+
+# Install the RPi PPA
+apt-add-repository -y ppa:fo0bar/rpi2
+apt-get update
+apt-get -y install rpi2-ubuntu-errata
+
+# Kernel installation
+# Install flash-kernel last so it doesn't try (and fail) to detect the
+# platform in the chroot.
+apt-get -y install raspberrypi-bootloader-nokernel
+apt-get -y --no-install-recommends install linux-image-rpi2
+apt-get -y install flash-kernel
+VMLINUZ="$(ls -1 /boot/vmlinuz-* | sort | tail -n 1)"
+[ -z "$VMLINUZ" ] && exit 1
+cp $VMLINUZ /boot/firmware/kernel7.img
+INITRD="$(ls -1 /boot/initrd.img-* | sort | tail -n 1)"
+[ -z "$INITRD" ] && exit 1
+cp $INITRD /boot/firmware/initrd7.img
+
+# Install video drivers
+apt-get -y install libraspberrypi0 libraspberrypi-bin \
+libraspberrypi-bin-nonfree
+
+apt-get -y install xserver-xorg-video-fbturbo
+cat <<EOM >/etc/X11/xorg.conf
+Section "Device"
+Identifier "Raspberry Pi FBDEV"
+Driver "fbturbo"
+Option "fbdev" "/dev/fb0"
+Option "SwapbuffersWait" "true"
+EndSection
+EOM
+
+# Create sym-links to VideoCore utilities for 3rd party script
+# compatibility.
+mkdir -p /opt/vc/{bin,sbin}
+for FILE in containers_check_frame_int \
+            containers_datagram_receiver \
+            containers_datagram_sender \
+            containers_dump_pktfile \
+            containers_rtp_decoder \
+            containers_stream_client \
+            containers_stream_server \
+            containers_test \
+            containers_test_bits \
+            containers_test_uri \
+            containers_uri_pipe \
+            edidparser \
+            mmal_vc_diag \
+            raspistill \
+            raspivid \
+            raspividyuv \
+            raspiyuv \
+            tvservice \
+            vcdbg \
+            vcgencmd \
+            vchiq_test \
+            vcsmem; do
+    ln -s /usr/bin/${FILE} /opt/vc/bin/
+done
+ln -s /usr/sbin/vcfiled /opt/vc/sbin/
+
+# omxplayer
+# - Requires: libpcre3 libfreetype6 fonts-freefont-ttf dbus libssl1.0.0 libsmbclient libssh-4
+#wget -c "${OMX}" -O $R/tmp/omxplayer.deb
+#chroot $R gdebi -n /tmp/omxplayer.deb
+
+# copies-and-fills
+wget -c http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.4-1_armhf.deb -O /tmp/cofi.deb
+dpkg -i /tmp/cofi.deb
+rm /tmp/cofi.deb
+
+# raspi-config - Needs forking/modifying to support Ubuntu 15.04
+# - Requires: whiptail parted lua5.1 triggerhappy
+#wget -c http://archive.raspberrypi.org/debian/pool/main/r/raspi-config/raspi-config_20150131-1_all.deb -O $R/tmp/rasp-config.deb
+#chroot $R gdebi -n /tmp/rasp-config.deb
+
+# Set up fstab
+cat <<EOM >/etc/fstab
+proc            /proc           proc    defaults          0       0
+/dev/mmcblk0p2  /               ext4   defaults,noatime  0       1
+/dev/mmcblk0p1  /boot/firmware  vfat    defaults          0       2
+EOM
+
+# Set up firmware config
+cat <<EOM >/boot/firmware/config.txt
+# For more options and information see
+# http://www.raspberrypi.org/documentation/configuration/config-txt.md
+# Some settings may impact device functionality. See link above for details
+
+# uncomment if you get no picture on HDMI for a default "safe" mode
+#hdmi_safe=1
+
+# uncomment this if your display has a black border of unused pixels visible
+# and your display can output without overscan
+#disable_overscan=1
+
+# uncomment the following to adjust overscan. Use positive numbers if console
+# goes off screen, and negative if there is too much border
+#overscan_left=16
+#overscan_right=16
+#overscan_top=16
+#overscan_bottom=16
+
+# uncomment to force a console size. By default it will be display's size minus
+# overscan.
+#framebuffer_width=1280
+#framebuffer_height=720
+
+# uncomment if hdmi display is not detected and composite is being output
+#hdmi_force_hotplug=1
+
+# uncomment to force a specific HDMI mode (this will force VGA)
+#hdmi_group=1
+#hdmi_mode=1
+
+# uncomment to force a HDMI mode rather than DVI. This can make audio work in
+# DMT (computer monitor) modes
+#hdmi_drive=2
+
+# uncomment to increase signal to HDMI, if you have interference, blanking, or
+# no display
+#config_hdmi_boost=4
+
+# uncomment for composite PAL
+#sdtv_mode=2
+
+#uncomment to overclock the arm. 700 MHz is the default.
+#arm_freq=800
+EOM
+
+ln -sf firmware/config.txt /boot/config.txt
+echo 'dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 elevator=deadline rootwait' > /boot/firmware/cmdline.txt
+ln -sf firmware/cmdline.txt /boot/cmdline.txt
+
+# Load sound module on boot
+cat <<EOM >/lib/modules-load.d/rpi2.conf
+snd_bcm2835
+bcm2708_rng
+EOM
+
+# Blacklist platform modules not applicable to the RPi2
+cat <<EOM >/etc/modprobe.d/rpi2.conf
+blacklist snd_soc_pcm512x_i2c
+blacklist snd_soc_pcm512x
+blacklist snd_soc_tas5713
+blacklist snd_soc_wm8804
+EOM

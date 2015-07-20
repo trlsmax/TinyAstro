@@ -8,6 +8,8 @@ without a computer.
 
 * RK3188 + AP6210(internal WIFI as AP)
 * Odroid C1 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)
+* Odroid U3 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)
+* Raspberry Pi 2 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)
 
 ## Require
 
@@ -44,6 +46,12 @@ sudo ./create_odroid_image
 set BOARD=U3 in create_odroid_image and run
 ```
 sudo ./create_odroid_image
+```
+
+### Build image for Raspberry Pi 2
+
+```
+sudo ./create_rpi2_image
 ```
 
 ## Usage

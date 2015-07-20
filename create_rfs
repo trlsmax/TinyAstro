@@ -167,6 +167,10 @@ cp ./common/cfg/xinitrc $odir/home/
 cp ./common/cfg/kstarsrc $odir/home/
 cp ./common/*.deb $odir
 
+# hostapd for rtl8192cu
+cp ./common/hostapd $odir/hostapd_rtl
+
+
 #======================================================================================
 if ! chroot $odir $_chroot_opt /bin/bash /second-stage; then
     mv $odir/install.log . > /dev/null 2>&1
@@ -189,9 +193,6 @@ cp ./common/cfg/sudoers $odir/etc/
 cp -rf "./common/cfg/Mona 1.0" $odir/usr/share/themes/
 cp ./common/cfg/xorg.dummy.conf $odir/etc/X11/
 cp ./common/cfg/Xwrapper.config $odir/etc/X11/
-
-# hostapd for rtl8192cu
-cp ./common/hostapd $odir/usr/sbin/hostapd_rtl
 
 #echo "Copy astrometry.net index ..."
 #echo ""

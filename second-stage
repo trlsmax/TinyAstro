@@ -216,6 +216,7 @@ mv /home/kstarsrc /home/astro/.config/
 
 chown -R $USER:$USER /home/$USER
 
+mv /hostapd_rtl /usr/sbin/
 chmod +x /usr/sbin/hostapd_rtl
 
 echo ""

@@ -118,7 +118,7 @@
 
 	4.1. Video hardware setup
 	------------------------------- 
-	Open the dialogue box 'Guider setup' in the toolbar.
+	Open the dialogue box 'Video Settings' in the toolbar.
 	Set the checkbox 'debug verbosity' to checked in the first place. This will allow for the maximum information to be seen, inluding errors.
 	Then it is necessary to specify the video device you will work with. To do this, you should select device in dropdown list 'Device'.
 	
@@ -128,28 +128,28 @@
 	You could also need to specify the required frequency of frames per second (FPS) and the size of the captured image. You should know that the exposure time of one frame is calculated as 1/fps, i.e. if fps is set to 5 (fps = 5), the exposure time of one frame will be 1/5 = 200 milliseconds. This time doesn't account for the time required for the data transfer and its postprocessing. That's why real FPS is somewhat smaller, than the chosen one. This difference doesn't influence substantially the guiding quality. You should test such parameters, as 'Autogain', 'Gain', 'Expo' (if they are available), on the image and watch how it will change.
 	The 'BW' parameter makes the screen layout monochromatic for several graphics formats, thus slightly decreasing the CPU usage.
 	The 'half fps' parameter makes the screen layout of every second frame. It affects only the screen layout and decreases the CPU usage, all frames are objectively captured and processed by the autoguider.
-	You can switch the 'use calibration' parameter on, if you are planning to calibrate the camera with a dark frame.
+	You can switch the 'Dark subtract' parameter on, if you are planning to calibrate the camera with a dark frame.
 	 
 	4.2. Actuator setup
 	------------------------------------------ 
-	Open the dialogue box 'Driver setup' in the toolbar.
+	Open the dialogue box 'Pulse Device Settings' in the toolbar.
 	You should choose the device to work with from the dropdown list in the first place.
 	
 	It is neccessary to restart the program for the connection to the specified device to occur. If all went right, the program would start without pulse driver error messages. If the box with the pulse driver initialization error message appeared, you should check the console log for more details.
-	If the launch is successful, open the dialogue box 'Driver setup' and check that the guiding device functions properly.
+	If the launch is successful, open the dialogue box 'Pulse Device Settings' and check that the guiding device functions properly.
 	There are several ways to do this:
 	1. by pressing test buttons RA+-, DEC+- in the dialogue box and checking the LED indication on the device (FTDI boxes).
 	2. by pressing test buttons RA+-, DEC+- in the dialogue box and listening to the sound of operating relays (LPT relay units)
 	3. by pressing test buttons RA+-, DEC+- in the dialogue box and testing RA/DEC commutator and ground pins for continuity with the multi-meter (all types of devices).
 	If the test is successful, you can connect the device to the autoguider port and start guiding. The operations described above are not sufficient sometimes. For example, the owners of relay units can face the dead time problem, when the sequence of commands "close-open-close" arrives too fast and the relay doesn't close and remains open. This could lead to serious disruptions in guiding. To eliminate this effect, the owners of relay units should turn the use of dead time DT on and choose it experimentally as low as possible, but so as to prevent any gaps.
 	The owners of GPIO, LPT and FTDI boxes may as well face the necessity to switch the correspondence between the virtual and real control bits (connector pins). Devconf-files are used for this purpose. They will be described below.
-	If your switch receives commands in the inverted form ( close - 0, not 1), you will need to set the checkbox "inverse bits" to checked. You can also assign the desired actions to the appropriate virtual bits in the 'Driver setup' dialogue box. These include RA+, RA-, DEC+, DEC- or to turn the bit off.
+	If your switch receives commands in the inverted form ( close - 0, not 1), you will need to set the checkbox "inverse bits" to checked. You can also assign the desired actions to the appropriate virtual bits in the 'Pulse Device Settings' dialogue box. These include RA+, RA-, DEC+, DEC- or to turn the bit off.
 	Indeed, everything is much simpler for the special astro cameras with the ST-4 connector, and the described above is irrelevant.
 
 
 6. Setting up the physical parameters of the guider
 ======================================= 
-	When the video device and the telescope mount control device are connected and working in the program, you must specify several parameters before the guiding can be started. You need to define in the dialogue box 'Guider setup':
+	When the video device and the telescope mount control device are connected and working in the program, you must specify several parameters before the guiding can be started. You need to define in the dialogue box 'Video Settings':
 	1. Aperture - the diameter of the guide objective, mm.
 	2. Focal length - the focal length of your guide, mm.
 	3. Matrix width - the amount of matrix pixels in horizontal direction, pixs.
@@ -184,7 +184,7 @@
 
 	6.2. Calibration with the dark frame
 	-------------------------------------- 
-	In order to calibrate the camera with a dark frame, define the amount of frames to accumulate in the field 'Frame count'. Cover the guide objective to prevent light from penetrating the camera and press the 'Start' button. At the end of the process the dark frame will be formed, that will be substracted from every new frame, taken from the camera, if the 'use calibration' parameter is chosen in the dialogue box of the guide setup.
+	In order to calibrate the camera with a dark frame, define the amount of frames to accumulate in the field 'Frame count'. Cover the guide objective to prevent light from penetrating the camera and press the 'Start' button. At the end of the process the dark frame will be formed, that will be substracted from every new frame, taken from the camera, if the 'Dark subtract' parameter is chosen in the dialogue box of the guide setup.
 
 
 8. Guiding

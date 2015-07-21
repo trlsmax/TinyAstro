@@ -437,6 +437,10 @@ if [ $_excode -ne 0 ]; then
     exit 0
 fi
 
+# script to resize sdcard
+cp ./common/fs_resize $odir
+chmod +x $odir/fs_resize
+
 # make necessary directories and copy some files
 mkdir -p $odir/etc/default > /dev/null 2>&1
 if [ ! "${_boot_on_ext4}" = "yes" ] ; then
@@ -529,6 +533,8 @@ if [ -f /first_boot ] ; then
 	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
 	rm -f /first_boot
+    bash /fs_resize
+    rm /fs_resize
 fi
 
 if [ -d /sys/class/net/wlan0 ] ; then

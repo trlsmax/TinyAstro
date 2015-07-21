@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# ******************************************
+# Resize Linux ext4 partition to fill sdcard
+# ******************************************
+
+if [ "$(id -u)" != "0" ]; then
+	echo "Script must be run as root !"
+	exit 0
+fi
+
+sdcard="/dev/mmcblk0"
+echo ""
+
+fdisk -l $sdcard | grep $sdcard
+echo ""
+
+_btrfs=`mount | grep -o btrfs`
+
+fat=`fdisk -l $sdcard | grep FAT16`
+if [ "${fat}" = "" ]; then
+  partno="1"
+else
+  partno="2"
+fi
+sdcard_part=`fdisk -l $sdcard | grep Linux | awk '{print $1}'`
+sdcard_sect=`fdisk -l $sdcard | grep "Disk $sdcard" | awk '{print $7}'`
+if [ "${sdcard_sect}" = "" ]; then
+    sdcard_sect=`fdisk -l $sdcard | grep total | awk '{print $8}'`
+fi
+sdcard_end=$(expr $sdcard_sect - 1024)
+
+part_start=`fdisk -l $sdcard | grep Linux | awk '{print $2}'`
+part_end=`fdisk -l $sdcard | grep Linux | awk '{print $3}'`
+
+echo "  Max block: $sdcard_end"
+echo "   Part end: $part_end"
+echo " Part start: $part_start"
+echo "   Part num: $partno"
+if [ ! "${_btrfs}" = "" ]; then
+    echo " btrfs part: yes"
+    _resize="btrfs filesystem resize max / &&"
+else
+    _resize="resize2fs ${sdcard_part} &&"
+fi
+echo ""
+if [ $part_end -ge $sdcard_end ]; then
+    echo "Partition allready maximum size !"
+    rm /usr/local/bin/fs_resize_warning > /dev/null 2>&1
+    exit 0
+fi
+
+#echo -n "WARNING: Do you want to resize \"$sdcard_part\" (y/N)?  "
+#read -n 1 ANSWER
+#if [ ! "${ANSWER}" = "y" ] ; then
+#    echo ""
+#    echo "Canceled.."
+#    exit 0
+#fi
+#echo ""
+
+# RESIZE PARTITION
+
+if [ "${partno}" = "1" ] ; then
+  echo -e "p\nd\nn\np\n$partno\n$part_start\n$sdcard_end\np\nw" | fdisk ${sdcard} > /dev/null 2>&1
+else
+  echo -e "p\nd\n$partno\nn\np\n$partno\n$part_start\n$sdcard_end\np\nw" | fdisk ${sdcard} > /dev/null 2>&1
+fi
+
+echo "PARTITION RESIZED."
+
+#/etc/init.d/resize2fs_once
+cat > /etc/init.d/resize2fs_once << _EOF_
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: resize2fs_once
+# Required-Start: \$local_fs \$remote_fs \$network \$syslog
+# Required-Stop:
+# Default-Start: 2 3 4 5 S
+# Default-Stop:
+# Short-Description: Resize the root filesystem to fill partition
+# Description:
+### END INIT INFO
+. /lib/lsb/init-functions
+case "\$1" in
+start)
+log_daemon_msg "Starting resize2fs_once" &&
+$_resize
+rm /etc/init.d/resize2fs_once &&
+update-rc.d resize2fs_once remove &&
+log_end_msg \$?
+;;
+*)
+echo "Usage: \$0 start" >&2
+exit 3
+;;
+esac
+_EOF_
+
+chmod +x /etc/init.d/resize2fs_once > /dev/null 2>&1
+
+update-rc.d resize2fs_once defaults > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "ERROR, run: sudo /etc/int.d/resize2fs_once start  AFTER REBOOT!"
+    exit 0
+fi
+
+REBOOT=1
+echo "*********************************************"
+echo "Rootfs Extended. Please REBOOT to take effect"
+echo "*********************************************"
+echo ""
+
+rm /usr/local/bin/fs_resize_warning > /dev/null 2>&1

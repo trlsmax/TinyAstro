@@ -41,7 +41,7 @@ if [ ! -z "$rtl8192cu" ]; then
 elif [ ! -z "$ap6210" ]; then
     sed -i 's/wlan[0-9]/'$ap6210'/' /etc/network/interfaces
     sed -i 's/^\(interface=\).*/\1'$ap6210'/' /etc/hostapd/ap.conf
-    hostapd_rtl -B /etc/hostapd/ap.conf & > /dev/null 2>&1
+    hostapd -B /etc/hostapd/ap.conf & > /dev/null 2>&1
     sed -i 's/^\(interface=\).*/\1'$ap6210'/' /etc/dnsmasq.conf
     service dnsmasq restart
 fi

@@ -2,7 +2,7 @@
 Name=Lin_Guider
 Categories=Utility;
 Exec=/home/astro/tools/Lin_guider/lin_guider
-Icon=/home/astro/tools/Lin_guider/guiding.png
+Icon=/home/astro/tools/Lin_guider/lin_guider.png
 StartupNotify=true
 Type=Application
 Terminal=false

@@ -536,6 +536,7 @@ if [ -f /first_boot ] ; then
 	rm -f /first_boot
     var=\$(bash /fs_resize)
     rm /fs_resize
+    reboot
 fi
 
 rtl8192cu=""

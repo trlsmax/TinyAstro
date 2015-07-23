@@ -100,15 +100,17 @@ _EOF_
 chmod +x /etc/init.d/resize2fs_once > /dev/null 2>&1
 
 update-rc.d resize2fs_once defaults > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "ERROR, run: sudo /etc/int.d/resize2fs_once start  AFTER REBOOT!"
-    exit 0
-fi
+#if [ $? -ne 0 ]; then
+#    echo "ERROR, run: sudo /etc/int.d/resize2fs_once start  AFTER REBOOT!"
+#    exit 0
+#fi
 
-REBOOT=1
-echo "*********************************************"
-echo "Rootfs Extended. Please REBOOT to take effect"
-echo "*********************************************"
-echo ""
+#REBOOT=1
+#echo "*********************************************"
+#echo "Rootfs Extended. Please REBOOT to take effect"
+#echo "*********************************************"
+#echo ""
 
 rm /usr/local/bin/fs_resize_warning > /dev/null 2>&1
+rm /fs_resize
+reboot

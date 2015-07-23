@@ -213,6 +213,9 @@ mv /home/kdeglobals /home/astro/.config/
 mv /home/xinitrc /home/astro/.xinitrc
 mv /home/kstarsrc /home/astro/.config/
 
+echo "[Qt]" >> /home/astro/.config/Trolltech.conf
+echo "style=GTK+" >> /home/astro/.config/Trolltech.conf
+
 #killall -KILL ntpd #> /dev/null 2>&1
 #killall -KILL smbd #> /dev/null 2>&1
 

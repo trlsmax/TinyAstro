@@ -193,7 +193,7 @@ cp ./common/cfg/sudoers $odir/etc/
 cp -rf "./common/cfg/Mona 1.0" $odir/usr/share/themes/
 cp ./common/cfg/xorg.dummy.conf $odir/etc/X11/
 cp ./common/cfg/Xwrapper.config $odir/etc/X11/
-cp ./common/kstars_chn/*.mo $odir/usr/share/locale/zh_CN/
+cp ./common/kstars_chn/*.mo $odir/usr/share/locale/zh_CN/LC_MESSAGES/
 
 #echo "Copy astrometry.net index ..."
 #echo ""

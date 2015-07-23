@@ -474,7 +474,7 @@ netmask 255.255.255.0
 
 _EOF_
 
-cat >> $odir/etc/hostapd/ap.conf << _EOF_
+cat >> $odir/etc/hostapd/ap_rtl8192cu.conf << _EOF_
 #ssid=TinyAstro
 wpa_passphrase=astronomy
 
@@ -532,13 +532,28 @@ cat > $odir/etc/rc.local << _EOF_
 if [ -f /first_boot ] ; then
 	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
+	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap_rtl8192cu.conf
 	rm -f /first_boot
-    bash /fs_resize
+    var=\$(bash /fs_resize)
     rm /fs_resize
 fi
 
-if [ -d /sys/class/net/wlan0 ] ; then
-	hostapd_rtl -B /etc/hostapd/ap.conf & > /dev/null 2>&1
+rtl8192cu=""
+for wlan in \$(ls /sys/class/net | grep wlan)
+do
+    tmp=\$(ethtool -i \$wlan | head -n 1 | awk '{print \$2}')
+    if [ "\$tmp" = "rtl8192cu" ]; then
+        rtl8192cu=\$wlan
+        break;
+    fi
+done
+
+if [ ! -z "\$rtl8192cu" ]; then
+    sed -i 's/wlan[0-9]/'\$rtl8192cu'/' /etc/network/interfaces
+    sed -i 's/^\(interface=\).*/\1'\$rtl8192cu'/' /etc/hostapd/ap_rtl8192cu.conf
+    hostapd_rtl -B /etc/hostapd/ap_rtl8192cu.conf & > /dev/null 2>&1
+    sed -i 's/^\(interface=\).*/\1'\$rtl8192cu'/' /etc/dnsmasq.conf
+    service dnsmasq restart
 fi
 
 su astro -c "startx -- :1 -config xorg.dummy.conf &"

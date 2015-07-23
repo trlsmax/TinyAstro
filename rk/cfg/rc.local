@@ -13,18 +13,37 @@
 
 
 
-#if [ -f /first_boot ] ; then
-#	RAND_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-#	echo "ssid=TinyAstro_$RAND_NAME" >> /etc/hostapd/ap.conf
-#	rm -f /first_boot
-#fi
+if [ -f /first_boot ] ; then
+	RAND_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+	echo "ssid=TinyAstro_$RAND_NAME" >> /etc/hostapd/ap.conf
+	echo "ssid=TinyAstro_$RAND_NAME" >> /etc/hostapd/ap_rtl8192cu.conf
+	rm -f /first_boot
+fi
 
-if [ -d /sys/class/net/wlan0 ]
-then
-	hostapd -B /etc/hostapd/ap.conf & > /dev/null 2>&1
-elif [ -d /sys/class/net/wlan1 ]
-then
-	hostapd_rtl8192cu -B /etc/hostapd/ap_rtl8192cu.conf & > /dev/null 2>&1
+rtl8192cu=""
+ap6210=""
+for wlan in $(ls /sys/class/net | grep wlan)
+do
+    tmp=$(ethtool -i $wlan | head -n 1 | awk '{print $2}')
+    if [ "$tmp" = "rtl8192cu" ]; then
+        rtl8192cu=$wlan
+    elif [ "$tmp" = "wl" ]; then
+        ap6210=$wlan
+    fi
+done
+
+if [ ! -z "$rtl8192cu" ]; then
+    sed -i 's/wlan[0-9]/'$rtl8192cu'/' /etc/network/interfaces
+    sed -i 's/^\(interface=\).*/\1'$rtl8192cu'/' /etc/hostapd/ap_rtl8192cu.conf
+    hostapd_rtl -B /etc/hostapd/ap_rtl8192cu.conf & > /dev/null 2>&1
+    sed -i 's/^\(interface=\).*/\1'$rtl8192cu'/' /etc/dnsmasq.conf
+    service dnsmasq restart
+elif [ ! -z "$ap6210" ]; then
+    sed -i 's/wlan[0-9]/'$ap6210'/' /etc/network/interfaces
+    sed -i 's/^\(interface=\).*/\1'$ap6210'/' /etc/hostapd/ap.conf
+    hostapd_rtl -B /etc/hostapd/ap.conf & > /dev/null 2>&1
+    sed -i 's/^\(interface=\).*/\1'$ap6210'/' /etc/dnsmasq.conf
+    service dnsmasq restart
 fi
 
 #Xvfb :0 -screen 0 1280x768x16 -ac & > /dev/null 2>&1

@@ -197,6 +197,8 @@ ln -s /etc/nginx/sites-available/tinyastro /etc/nginx/sites-enabled/tinyastro
 chown -R www-data:www-data /var/www/*
 
 mv /home/tools /home/astro/
+mkdir -p /usr/local/share/phd2
+cp /home/astro/tools/PHD2/PHD2GuideHelp.zip /usr/local/share/phd2/
 mv /home/desktop /home/astro/Desktop
 mv /home/gtkrc-2.0 /home/astro/.gtkrc-2.0
 

@@ -23,7 +23,7 @@ root	ALL=(ALL:ALL) ALL
 %sudo	ALL=(ALL:ALL) ALL
 astro ALL =NOPASSWD: /sbin/shutdown -h now,/sbin/halt,/sbin/poweroff,/sbin/reboot
 astro ALL =NOPASSWD: /bin/date,/bin/sed,/usr/bin/killall
-www-data ALL =NOPASSWD: /bin/date,/bin/systemctl reboot,/bin/systemctl halt
+www-data ALL =NOPASSWD: /bin/date,/sbin/reboot,/sbin/halt,/sbin/poweroff
 # See sudoers(5) for more information on "#include" directives:
 
 #includedir /etc/sudoers.d

@@ -11,12 +11,12 @@ if (isset($_POST['action'])) {
 }
 
 function reboot() {
-    passthru("sudo systemctl reboot");
+    passthru("sudo reboot");
     exit;
 }
 
 function halt() {
-    passthru("sudo systemctl halt");
+    passthru("sudo halt");
     exit;
 }
 ?>

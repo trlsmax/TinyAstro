@@ -462,8 +462,8 @@ cat >> $odir/etc/network/interfaces << _EOF_
 auto lo
 iface lo inet loopback
 
-auto eth0
-iface eth0 inet dhcp
+#auto eth0
+#iface eth0 inet dhcp
 
 #WIFI AP
 allow-hotplug wlan0
@@ -472,6 +472,12 @@ iface wlan0 inet static
 address 10.0.0.1
 netmask 255.255.255.0
 
+_EOF_
+
+cat >> $odir/etc/init/eth0.conf << _EOF_
+start on net-device-added INTERFACE=eth0
+task
+exec ifup eth0
 _EOF_
 
 cat >> $odir/etc/hostapd/ap_rtl8192cu.conf << _EOF_

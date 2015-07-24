@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Tinyastro by trlsmax</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Tinyastro</h1>
+        <p>Scripts to build TinyAstro image</p>
+        <p class="view"><a href="https://github.com/trlsmax/TinyAstro">View the Project on GitHub <small>trlsmax/TinyAstro</small></a></p>
+        <ul>
+          <li><a href="https://github.com/trlsmax/TinyAstro/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/trlsmax/TinyAstro/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/trlsmax/TinyAstro">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="tinyastro" class="anchor" href="#tinyastro" aria-hidden="true"><span class="octicon octicon-link"></span></a>TinyAstro</h1>
+
+<p>Scripts to build TinyAstro image. 
+TinyAstro is a ARM Linux system with Kstars and INDI libs.
+With your mobile phone or tablet, you can control your gears
+without a computer.</p>
+
+<h2>
+<a id="support-device" class="anchor" href="#support-device" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support device</h2>
+
+<ul>
+<li>RK3188 + AP6210(internal WIFI as AP)</li>
+<li>Odroid C1 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)</li>
+<li>Odroid U3 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)</li>
+<li>Raspberry Pi 2 + RTL8192CU(usb WIFI as AP) (HDMI not test yet)</li>
+</ul>
+
+<h2>
+<a id="require" class="anchor" href="#require" aria-hidden="true"><span class="octicon octicon-link"></span></a>Require</h2>
+
+<ol>
+<li>Ubuntu/Debian linux system</li>
+<li>debootstrap and qemu-user-static</li>
+</ol>
+
+<pre><code>sudo apt-get install debootstrap qemu-user-static
+</code></pre>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<h3>
+<a id="get-root-file-system" class="anchor" href="#get-root-file-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get root file system</h3>
+
+<pre><code>sudo ./create_rfs
+</code></pre>
+
+<h3>
+<a id="build-image-for-rk3188" class="anchor" href="#build-image-for-rk3188" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build image for RK3188</h3>
+
+<pre><code>sudo ./create_rk_image
+</code></pre>
+
+<h3>
+<a id="build-image-for-odroid-c1" class="anchor" href="#build-image-for-odroid-c1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build image for Odroid C1</h3>
+
+<p>set BOARD=C1 in create_odroid_image and run</p>
+
+<pre><code>sudo ./create_odroid_image
+</code></pre>
+
+<h3>
+<a id="build-image-for-odroid-u3" class="anchor" href="#build-image-for-odroid-u3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build image for Odroid U3</h3>
+
+<p>set BOARD=U3 in create_odroid_image and run</p>
+
+<pre><code>sudo ./create_odroid_image
+</code></pre>
+
+<h3>
+<a id="build-image-for-raspberry-pi-2" class="anchor" href="#build-image-for-raspberry-pi-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build image for Raspberry Pi 2</h3>
+
+<pre><code>sudo ./create_rpi2_image
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>user name : <code>astro</code></p>
+
+<p>password: <code>astronomy</code></p>
+
+<p>use vncviewer to connect port 5900 and you will get a desktop</p>
+
+<p>If you use WIFI AP, there will be a AP SSID like <code>TinyAstro_xxxxxx</code>
+connect it with password <code>astronomy</code>.</p>
+
+<p>*** These scripts is base on loboris's
+"Ubuntu &amp; Debian debootstrap instalation" scripts from <a href="http://forum.odroid.com/viewtopic.php?f=112&amp;t=8075">forum of odroid</a> ***</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/trlsmax">trlsmax</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

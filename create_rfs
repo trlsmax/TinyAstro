@@ -99,9 +99,9 @@ proc_wait() {
 echo ""
 
 # ====== remove old rfs =======
-#if [ -d $odir ] ; then
-#    rm -rf $odir
-#fi
+if [ -d $odir ] ; then
+    rm -rf $odir
+fi
 
 echo "DEBOOTSTRAP, FIRST STAGE"
 debootstrap --arch $arch --foreign --verbose --variant=minbase --include=wget $distro $odir $repo #> /dev/null 2>&1 &

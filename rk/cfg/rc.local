@@ -21,7 +21,7 @@ if [ -f /first_boot ] ; then
 fi
 
 rtl8192cu=""
-ap6210=""
+ap6210="wlan0"
 for wlan in $(ls /sys/class/net | grep wlan)
 do
     tmp=$(ethtool -i $wlan | head -n 1 | awk '{print $2}')

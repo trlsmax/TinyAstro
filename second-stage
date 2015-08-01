@@ -184,6 +184,9 @@ echo $USER:$USERPASS | chpasswd
 usermod -c $USER $USER ##>> $_LOGFILE 2>&1
 adduser $USER sudo #>> $_LOGFILE 2>&1
 
+# creat dir for kstars
+mkdir -p /home/$USER/.local/share/kstars
+
 # ENABLE SSH ROOT LOOGIN WITH PASSWORD
 if [ -f /etc/ssh/sshd_config ]; then
     cat /etc/ssh/sshd_config | sed s/"PermitRootLogin without-password"/"PermitRootLogin yes"/g > /tmp/sshd_config

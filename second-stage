@@ -183,6 +183,7 @@ useradd -m -s "/bin/bash" $USER #>> $_LOGFILE 2>&1
 echo $USER:$USERPASS | chpasswd
 usermod -c $USER $USER ##>> $_LOGFILE 2>&1
 adduser $USER sudo #>> $_LOGFILE 2>&1
+adduser $USER dialout #>> $_LOGFILE 2>&1
 
 # creat dir for kstars
 mkdir -p /home/$USER/.local/share/kstars

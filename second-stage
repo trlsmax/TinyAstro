@@ -18,7 +18,7 @@ USERPASS="astronomy"
 
 # Set timezone, for default (HOST'S) set  _timezone=""
 #_timezone="Etc/UTC"
-_timezone=""
+_timezone="Asia/Shanghai"
 
 # IF YOU WANT TO INSTALL THE LANGUAGE DIFFERENT THEN THE HOST's:
 # COMMENT FOR DEFAULT (HOST) settings

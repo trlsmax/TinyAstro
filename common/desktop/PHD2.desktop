@@ -2,6 +2,7 @@
 Name=PHD2
 Categories=Utility;
 Exec=/home/astro/tools/PHD2/phd2
+Path=/home/astro/tools/PHD2/
 Icon=/home/astro/tools/PHD2/phd2.png
 StartupNotify=true
 Type=Application

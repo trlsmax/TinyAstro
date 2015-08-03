@@ -698,6 +698,10 @@ if [ ! "${sdcard}" = "" ]; then
         md5sum $sdcard > $sdcard.md5sum
         md5sum $sdcard.xz > $sdcard.xz.md5sum
     fi
+
+    rm -f ./${sdcard}1 ./${sdcard}2 ./${sdcard}u
+    tar cJvf ./tinyastro_${BOARD}.tar.xz ./${sdcard} ./README
+    rm -f ./${sdcard}
 fi
 
 if [ "${_directsd}" = "yes" ] ; then

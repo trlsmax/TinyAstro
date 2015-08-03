@@ -89,5 +89,5 @@ rm -f ./tmp.img ./update.img ./tinyastro_rk3188.tar.xz
 ./rk/img_maker ./rk/img/RK3188Loader\(L\)_V2.10.bin ./tmp.img ./update.img
 
 rm -rf $image_tmp ./tmp.img ./rk/img/system.img
-tar cJvf ./tinyastro.tar.xz ./update.img ./README ./rk/RKBatchTool-v1.8.rar ./rk/upgrade_tool
+tar cJvf ./tinyastro_rk3188.tar.xz ./update.img ./README ./rk/RKBatchTool-v1.8.rar ./rk/upgrade_tool
 rm -f ./update.img

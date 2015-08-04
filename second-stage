@@ -216,6 +216,7 @@ fi
 mv /home/kdeglobals /home/astro/.config/
 mv /home/xinitrc /home/astro/.xinitrc
 mv /home/kstarsrc /home/astro/.config/
+mv /home/panel /home/astro/.config/lxpanel/default/panels/
 
 echo "[Qt]" >> /home/astro/.config/Trolltech.conf
 echo "style=GTK+" >> /home/astro/.config/Trolltech.conf

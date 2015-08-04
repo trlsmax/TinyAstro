@@ -165,6 +165,7 @@ cp ./common/cfg/gtkrc-2.0 $odir/home/
 cp ./common/cfg/kdeglobals $odir/home/
 cp ./common/cfg/xinitrc $odir/home/
 cp ./common/cfg/kstarsrc $odir/home/
+cp ./common/cfg/panel $odir/home/
 cp ./common/*.deb $odir
 
 # hostapd for rtl8192cu

@@ -1,3 +1,27 @@
+2015-11-25 Lin_guider 3.2.1 (c)Galaxy Master <galaxy_master@mail.ru>
+
+	* Use latest Atik SDK (0.41), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Use latest ASI SDK (0.2.1026), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Fix gain control overflow in ASI driver, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add save_frame in lg_tool.pl, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+
+2015-11-03 Lin_guider 3.2.0 (c)Galaxy Master <galaxy_master@mail.ru>
+
+	* Fixed DEC swapping in GPIO driver
+	* Guider window UI tweaks
+	* Add adjust window to fit image button
+	* Add support for all Bayer patterns, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Always use '.' in floating point numbers, regardless of the locale, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add normalization of gain coefficients, if enabled changing the guide rate will affect
+	  directly the guiding, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Restore reticle angle after restart, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Use latest Atik SDK (0.34), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Use latest ASI SDK (0.1.0803), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add colour support for ASI cameras, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add 16-bit support for ASI cameras, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Fix seeveral issues in ASI driver, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Small fix in Starlight Xpress driver, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+
 2015-04-12 Lin_guider 3.1.0 (c)Galaxy Master <galaxy_master@mail.ru>
 
 	* Make reticle and square dragging responsive (independent of the exposure time)

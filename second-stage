@@ -110,18 +110,18 @@ locale-gen zh_CN.UTF-8 #>> $_LOGFILE 2>&1
 echo "Done"
 
 # ** INSTALL base language pack for your language
-_DST=`lsb_release -si`
-if [ "${_DST}" = "Ubuntu" ] ; then
-    echo "Installing language pack..."
-    apt-get -y -q install language-pack-$LANGUAGE-base --no-install-recommends #>> $_LOGFILE 2>&1 &
-    #pid=$!
-    #proc_wait $pid "please wait"
-    apt-get clean #>> $_LOGFILE 2>&1
-else
-    cat /etc/locale.gen | sed s/"# $LANG"/"$LANG"/g > /tmp/locale.gen
-    mv /tmp/locale.gen /etc/locale.gen
-    locale-gen #>> $_LOGFILE 2>&1
-fi
+#_DST=`lsb_release -si`
+#if [ "${_DST}" = "Ubuntu" ] ; then
+#    echo "Installing language pack..."
+#    apt-get -y -q install language-pack-$LANGUAGE-base --no-install-recommends #>> $_LOGFILE 2>&1 &
+#    #pid=$!
+#    #proc_wait $pid "please wait"
+#    apt-get clean #>> $_LOGFILE 2>&1
+#else
+#    cat /etc/locale.gen | sed s/"# $LANG"/"$LANG"/g > /tmp/locale.gen
+#    mv /tmp/locale.gen /etc/locale.gen
+#    locale-gen #>> $_LOGFILE 2>&1
+#fi
 
 # ** INSTALL more packages ....
 # apt-get -y install net-tools wireless-tools wpasupplicant axel build-essential git whiptail unzip
@@ -134,7 +134,6 @@ apt-get clean #>> $_LOGFILE 2>&1
 # ============ install kstars-bleeding ===================
 echo "Add PPA..."
 apt-add-repository -y ppa:mutlaqja/ppa #>> $_LOGFILE 2>&1 &
-apt-add-repository -y ppa:mutlaqja/astrometry.net #>> $_LOGFILE 2>&1 &
 echo "Updating..."
 apt-get update #>> $_LOGFILE 2>&1 &
 #pid=$!
@@ -150,8 +149,10 @@ apt-get clean #>> $_LOGFILE 2>&1
 
 # install atik driver and shoestring driver
 # install astrometry.net index
-wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
+#wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
 
+dpkg --force-all -i /atikccd*.deb
+rm /atikccd*.deb
 dpkg -i /*.deb
 rm /*.deb
 

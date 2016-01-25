@@ -113,7 +113,7 @@ debootstrap --arch $arch --foreign --verbose --variant=minbase --include=wget $d
 # ** CREATE NEW sources.list:
 # ***************************
 echo "Creating \"sources.list\""
-case ${distro} in trusty|utopic|precise|vivid)
+case ${distro} in trusty|utopic|precise|vivid|wily)
 cat > $odir/sources.list << _EOF_
 deb $repo/ $distro main restricted universe multiverse
 deb-src $repo/ $distro main restricted universe multiverse

@@ -126,7 +126,7 @@ fi
 # ** INSTALL more packages ....
 # apt-get -y install net-tools wireless-tools wpasupplicant axel build-essential git whiptail unzip
 echo "Installing more packages..."
-apt-get -y install openssh-sftp-server ethtool udevil usbutils nano htop tmux dbus btrfs-tools openbox spacefm lxpanel xfonts-base xfonts-wqy xfonts-75dpi xfonts-100dpi net-tools wireless-tools hostapd wpasupplicant dnsmasq unzip bzip2 libqt4-core libqt4-gui libftdi1 libopencv-imgproc2.4v5 nginx php5-cgi php5-fpm lxtask lxde-icon-theme leafpad lxappearance xvt xorg xserver-xorg-video-dummy x11vnc openssh-client --no-install-recommends #>> $_LOGFILE 2>&1 &
+apt-get -y install openssh-sftp-server ethtool udevil usbutils nano htop tmux dbus btrfs-tools openbox spacefm lxpanel xfonts-base xfonts-wqy xfonts-75dpi xfonts-100dpi net-tools wireless-tools hostapd wpasupplicant dnsmasq unzip bzip2 libqt4-core libqt4-gui libftdi1 libopencv-imgproc2.4v5 nginx-light php5-cgi php5-fpm lxtask lxde-icon-theme leafpad lxappearance xvt xorg xserver-xorg-video-dummy x11vnc openssh-client --no-install-recommends #>> $_LOGFILE 2>&1 &
 #pid=$!
 #proc_wait $pid "please wait"
 apt-get clean #>> $_LOGFILE 2>&1

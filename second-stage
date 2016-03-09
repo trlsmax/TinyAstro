@@ -151,7 +151,8 @@ apt-get clean #>> $_LOGFILE 2>&1
 # install astrometry.net index
 wget http://data.astrometry.net/debian/astrometry-data-4208-4219_0.45_all.deb -O /astrometry_index.deb
 
-dpkg --force-all -i /atikccd*.deb
+dpkg -x /atikccd*.deb /
+ln -s /usr/lib/arm-linux-gnueabihf/libcfitsio.so.2.3.37 /usr/lib/arm-linux-gnueabihf/libcfitsio.so.3
 rm /atikccd*.deb
 dpkg -i /*.deb
 rm /*.deb

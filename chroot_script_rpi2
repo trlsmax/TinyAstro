@@ -1,161 +1,288 @@
 #!/bin/sh
 export DEBIAN_FRONTEND=noninteractive
+export FLAVOUR=ubuntu-minimal
+export FS=ext4
 
-# Install the RPi PPA
-cat <<"EOM" >/etc/apt/preferences.d/rpi2-ppa
-Package: *
-Pin: release o=LP-PPA-fo0bar-rpi2
-Pin-Priority: 990
+function configure_hardware() {
+    # Ported
+    # http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-firmware_1.20151118-1.dsc # Foundation's Kernel
+    # https://launchpad.net/~fo0bar/+archive/ubuntu/rpi2-nightly/+files/xserver-xorg-video-fbturbo_0%7Egit.20151007.f9a6ed7-0%7Enightly.dsc
 
-Package: *
-Pin: release o=LP-PPA-fo0bar-rpi2-staging
-Pin-Priority: 990
-EOM
+    # Kernel and Firmware - Pending
+    # https://twolife.be/raspbian/pool/main/bcm-videocore-pkgconfig/bcm-videocore-pkgconfig_1.dsc    
+    # https://twolife.be/raspbian/pool/main/linux/linux_4.1.8-1+rpi1.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1.dsc # FTBFS in a PPA
 
-# Install the RPi PPA
-apt-add-repository -y ppa:fo0bar/rpi2
-apt-get update
-apt-get -y install rpi2-ubuntu-errata
+    #local FS="${1}"
+    #if [ "${FS}" != "ext4" ] && [ "${FS}" != 'f2fs' ]; then
+    #    echo "ERROR! Unsupport filesystem requested. Exitting."
+    #    exit 1
+    #fi
 
-# Kernel installation
-# Install flash-kernel last so it doesn't try (and fail) to detect the
-# platform in the chroot.
-apt-get -y install raspberrypi-bootloader-nokernel
-apt-get -y --no-install-recommends install linux-image-rpi2
-apt-get -y install flash-kernel
-VMLINUZ="$(ls -1 /boot/vmlinuz-* | sort | tail -n 1)"
-[ -z "$VMLINUZ" ] && exit 1
-cp $VMLINUZ /boot/firmware/kernel7.img
-INITRD="$(ls -1 /boot/initrd.img-* | sort | tail -n 1)"
-[ -z "$INITRD" ] && exit 1
-cp $INITRD /boot/firmware/initrd7.img
+    # gdebi-core used for installing copies-and-fills and omxplayer
+    apt-get -y install gdebi-core
+    local COFI="http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.5-1_armhf.deb"
 
-# Install video drivers
-apt-get -y install libraspberrypi0 libraspberrypi-bin \
-libraspberrypi-bin-nonfree
+    # Install the RPi PPA
+    apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
+    apt-get update
 
-apt-get -y install xserver-xorg-video-fbturbo
-cat <<EOM >/etc/X11/xorg.conf
+    # Firmware Kernel installation
+    apt-get -y install libraspberrypi-bin libraspberrypi-dev \
+    libraspberrypi-doc libraspberrypi0 raspberrypi-bootloader rpi-update
+    apt-get -y install linux-firmware linux-firmware-nonfree
+    rpi-update
+
+    # Add VideoCore libs to ld.so
+    echo "/opt/vc/lib" > /etc/ld.so.conf.d/vmcs.conf
+
+    #if [ "${FLAVOUR}" != "ubuntu-minimal" ] && [ "${FLAVOUR}" != "ubuntu-standard" ]; then
+        # Install X drivers
+        apt-get -y install xserver-xorg-video-fbturbo
+        cat <<EOM >$R/etc/X11/xorg.conf
 Section "Device"
-Identifier "Raspberry Pi FBDEV"
-Driver "fbturbo"
-Option "fbdev" "/dev/fb0"
-Option "SwapbuffersWait" "true"
+    Identifier "Raspberry Pi FBDEV"
+    Driver "fbturbo"
+    Option "fbdev" "/dev/fb0"
+    Option "SwapbuffersWait" "true"
 EndSection
 EOM
+        ## omxplayer
+        #local OMX="http://omxplayer.sconde.net/builds/omxplayer_0.3.6~git20150912~d99bd86_armhf.deb"
+        ## - Requires: libpcre3 libfreetype6 fonts-freefont-ttf dbus libssl1.0.0 libsmbclient libssh-4
+        #wget -c "${OMX}" -O $R/tmp/omxplayer.deb
+        #gdebi -n /tmp/omxplayer.deb
 
-# Create sym-links to VideoCore utilities for 3rd party script
-# compatibility.
-mkdir -p /opt/vc/{bin,sbin}
-for FILE in containers_check_frame_int \
-            containers_datagram_receiver \
-            containers_datagram_sender \
-            containers_dump_pktfile \
-            containers_rtp_decoder \
-            containers_stream_client \
-            containers_stream_server \
-            containers_test \
-            containers_test_bits \
-            containers_test_uri \
-            containers_uri_pipe \
-            edidparser \
-            mmal_vc_diag \
-            raspistill \
-            raspivid \
-            raspividyuv \
-            raspiyuv \
-            tvservice \
-            vcdbg \
-            vcgencmd \
-            vchiq_test \
-            vcsmem; do
-    ln -s /usr/bin/${FILE} /opt/vc/bin/
-done
-ln -s /usr/sbin/vcfiled /opt/vc/sbin/
+        ## Make Ubiquity "compatible" with the Raspberry Pi 2 kernel.
+        #if [ ${OEM_CONFIG} -eq 1 ]; then
+        #    #sed -i 's/self\.remove_unusable_kernels()/#self\.remove_unusable_kernels()/' $R/usr/share/ubiquity/plugininstall.py
+        #    #sed -i "s/\['linux-image-' + self.kernel_version,/\['/" $R/usr/share/ubiquity/plugininstall.py
+        #    cp plugininstall-pi.py $R/usr/share/ubiquity/plugininstall.py
+        #fi
+    #fi
 
-# omxplayer
-# - Requires: libpcre3 libfreetype6 fonts-freefont-ttf dbus libssl1.0.0 libsmbclient libssh-4
-#wget -c "${OMX}" -O $R/tmp/omxplayer.deb
-#chroot $R gdebi -n /tmp/omxplayer.deb
+    # Hardware - Create a fake HW clock and add rng-tools
+    apt-get -y install fake-hwclock fbset i2c-tools rng-tools
 
-# copies-and-fills
-wget -c http://archive.raspberrypi.org/debian/pool/main/r/raspi-copies-and-fills/raspi-copies-and-fills_0.4-1_armhf.deb -O /tmp/cofi.deb
-dpkg -i /tmp/cofi.deb
-rm /tmp/cofi.deb
-
-# raspi-config - Needs forking/modifying to support Ubuntu 15.04
-# - Requires: whiptail parted lua5.1 triggerhappy
-#wget -c http://archive.raspberrypi.org/debian/pool/main/r/raspi-config/raspi-config_20150131-1_all.deb -O $R/tmp/rasp-config.deb
-#chroot $R gdebi -n /tmp/rasp-config.deb
-
-# Set up fstab
-cat <<EOM >/etc/fstab
-proc            /proc           proc    defaults          0       0
-/dev/mmcblk0p2  /               ext4   defaults,noatime  0       1
-/dev/mmcblk0p1  /boot/firmware  vfat    defaults          0       2
-EOM
-
-# Set up firmware config
-cat <<EOM >/boot/firmware/config.txt
-# For more options and information see
-# http://www.raspberrypi.org/documentation/configuration/config-txt.md
-# Some settings may impact device functionality. See link above for details
-
-# uncomment if you get no picture on HDMI for a default "safe" mode
-#hdmi_safe=1
-
-# uncomment this if your display has a black border of unused pixels visible
-# and your display can output without overscan
-#disable_overscan=1
-
-# uncomment the following to adjust overscan. Use positive numbers if console
-# goes off screen, and negative if there is too much border
-#overscan_left=16
-#overscan_right=16
-#overscan_top=16
-#overscan_bottom=16
-
-# uncomment to force a console size. By default it will be display's size minus
-# overscan.
-#framebuffer_width=1280
-#framebuffer_height=720
-
-# uncomment if hdmi display is not detected and composite is being output
-#hdmi_force_hotplug=1
-
-# uncomment to force a specific HDMI mode (this will force VGA)
-#hdmi_group=1
-#hdmi_mode=1
-
-# uncomment to force a HDMI mode rather than DVI. This can make audio work in
-# DMT (computer monitor) modes
-#hdmi_drive=2
-
-# uncomment to increase signal to HDMI, if you have interference, blanking, or
-# no display
-#config_hdmi_boost=4
-
-# uncomment for composite PAL
-#sdtv_mode=2
-
-#uncomment to overclock the arm. 700 MHz is the default.
-#arm_freq=800
-EOM
-
-ln -sf firmware/config.txt /boot/config.txt
-echo 'dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 elevator=deadline rootwait' > /boot/firmware/cmdline.txt
-ln -sf firmware/cmdline.txt /boot/cmdline.txt
-
-# Load sound module on boot
-cat <<EOM >/lib/modules-load.d/rpi2.conf
+    # Load sound module on boot and enable HW random number generator
+    cat <<EOM > /etc/modules-load.d/rpi2.conf
 snd_bcm2835
 bcm2708_rng
 EOM
 
-# Blacklist platform modules not applicable to the RPi2
-cat <<EOM >/etc/modprobe.d/rpi2.conf
+    # Blacklist platform modules not applicable to the RPi2
+    cat <<EOM > /etc/modprobe.d/blacklist-rpi2.conf
 blacklist snd_soc_pcm512x_i2c
 blacklist snd_soc_pcm512x
 blacklist snd_soc_tas5713
 blacklist snd_soc_wm8804
 EOM
+
+    # Disable TLP
+    if [ -f /etc/default/tlp ]; then
+        sed -i s'/TLP_ENABLE=1/TLP_ENABLE=0/' /etc/default/tlp
+    fi
+
+    # udev rules
+    printf 'SUBSYSTEM=="vchiq", GROUP="video", MODE="0660"\n' > /etc/udev/rules.d/10-local-rpi.rules
+    printf "SUBSYSTEM==\"gpio*\", PROGRAM=\"/bin/sh -c 'chown -R root:gpio /sys/class/gpio && chmod -R 770 /sys/class/gpio; chown -R root:gpio /sys/devices/virtual/gpio && chmod -R 770 /sys/devices/virtual/gpio'\"\n" > /etc/udev/rules.d/99-com.rules
+    printf 'SUBSYSTEM=="input", GROUP="input", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
+    printf 'SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
+    printf 'SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"\n' >> /etc/udev/rules.d/99-com.rules
+    cat <<EOF > /etc/udev/rules.d/40-scratch.rules
+ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0003", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
+EOF
+
+    # copies-and-fills
+    wget -c "${COFI}" -O /tmp/cofi.deb
+    gdebi -n /tmp/cofi.deb
+    # Disabled cofi so it doesn't segfault when building via qemu-user-static
+    mv -v /etc/ld.so.preload /etc/ld.so.preload.disable
+
+    # Set up fstab
+    cat <<EOM > /etc/fstab
+proc            /proc           proc    defaults          0       0
+/dev/mmcblk0p2  /               ext4   defaults,noatime  0       1
+/dev/mmcblk0p1  /boot/          vfat    defaults          0       2
+EOM
+
+    # Set up firmware config
+    wget -c https://raw.githubusercontent.com/Evilpaul/RPi-config/master/config.txt -O /boot/config.txt
+    if [ "${FLAVOUR}" == "ubuntu-minimal" ] || [ "${FLAVOUR}" == "ubuntu-standard" ]; then
+        echo "net.ifnames=0 biosdevname=0 dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=${FS} elevator=deadline rootwait quiet splash" > /boot/cmdline.txt
+    else
+        echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=${FS} elevator=deadline rootwait quiet splash" > $R/boot/cmdline.txt
+        sed -i 's/#framebuffer_depth=16/framebuffer_depth=32/' $R/boot/config.txt
+        sed -i 's/#framebuffer_ignore_alpha=0/framebuffer_ignore_alpha=1/' $R/boot/config.txt
+    fi
+
+    # Save the clock
+    fake-hwclock save
+}
+
+function install_software() {
+    # https://archive.raspberrypi.org/debian/pool/main/m/minecraft-pi/minecraft-pi_0.1.1-4.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/r/raspi-gpio/raspi-gpio_0.20150914.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/s/sonic-pi/sonic-pi_2.7.0-1.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/p/picamera/picamera_1.10-1.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/n/nuscratch/nuscratch_20150916.dsc # Modify wrapper in debian/scratch to just be "sudo "
+    # http://archive.raspberrypi.org/debian/pool/main/r/rtimulib/rtimulib_7.2.1-3.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/r/raspi-config/raspi-config_20151117.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/r/rpi.gpio/rpi.gpio_0.5.11-1+jessie.dsc # Hardcode target Python 3.x version in debian/rules
+    # http://archive.raspberrypi.org/debian/pool/main/s/spidev/spidev_2.0~git20150907.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/c/codebug-tether/codebug-tether_0.4.3-1.dsc # Hardcode target Python 3.x in debian/rules
+    # http://archive.raspberrypi.org/debian/pool/main/c/codebug-i2c-tether/codebug-i2c-tether_0.2.3-1.dsc # Hardcode target Python 3.x in debian/rules
+    # http://archive.raspberrypi.org/debian/pool/main/c/compoundpi/compoundpi_0.4-1.dsc
+
+    # FTBFS
+    # http://archive.raspberrypi.org/debian/pool/main/g/gst-omx1.0/gst-omx1.0_1.0.0.1-0+rpi15.dsc
+    # http://archive.raspberrypi.org/debian/pool/main/r/rc-gui/rc-gui_0.1-1.dsc
+
+    # Pending
+    # http://archive.raspberrypi.org/debian/pool/main/p/python-sense-hat/python-sense-hat_2.1.0-1.dsc # FTBFS
+    # http://archive.raspberrypi.org/debian/pool/main/a/astropi/astropi_1.1.5-1.dsc # REQ Sense-hat
+    # http://archive.raspberrypi.org/debian/pool/main/s/sense-hat/sense-hat_1.2.dsc # REQ python-sense-hat
+    # http://archive.raspberrypi.org/debian/pool/main/p/pgzero/pgzero_1.0.2-1.dsc
+    # https://archive.raspberrypi.org/debian/pool/main/e/epiphany-browser/epiphany-browser_3.8.2.0-0rpi23.dsc
+
+    # Kodi - Pending
+    # http://archive.ubuntu.com/ubuntu/pool/universe/a/afpfs-ng/afpfs-ng_0.8.1-5ubuntu1.dsc
+    # http://archive.mene.za.net/raspbian/pool/unstable/k/kodi/kodi_15.1-1%7ejessie.dsc
+    # https://twolife.be/raspbian/pool/main/kodi/kodi_15.1+dfsg1-2+rpi1.dsc # FTBFS
+    # https://twolife.be/raspbian/pool/main/omxplayer/omxplayer_0.git20150303-1.dsc
+
+    local NODERED="http://archive.raspberrypi.org/debian/pool/main/n/nodered/nodered_0.12.1_armhf.deb"
+    local SCRATCH="http://archive.raspberrypi.org/debian/pool/main/s/scratch/scratch_1.4.20131203-2_all.deb"
+    local WIRINGPI="http://archive.raspberrypi.org/debian/pool/main/w/wiringpi/wiringpi_2.24_armhf.deb"
+    local SENSEHAT2="http://archive.raspberrypi.org/debian/pool/main/p/python-sense-hat/python-sense-hat_2.1.0-1_armhf.deb"
+    local SENSEHAT3="http://archive.raspberrypi.org/debian/pool/main/p/python-sense-hat/python3-sense-hat_2.1.0-1_armhf.deb"
+    local ASTROPI2="http://archive.raspberrypi.org/debian/pool/main/a/astropi/python-astropi_1.1.5-1_armhf.deb"
+    local ASTROPI3="http://archive.raspberrypi.org/debian/pool/main/a/astropi/python3-astropi_1.1.5-1_armhf.deb"
+    local TBOPLAYER_URL="https://raw.githubusercontent.com/KenT2/tboplayer/master/"
+
+	if [ "${FLAVOUR}" == "ubuntu-minimal" ] || [ "${FLAVOUR}" == "ubuntu-standard" ] || [ "${FLAVOUR}" == "ubuntu-mate" ]; then
+        # Install the RPi PPA
+        apt-add-repository -y ppa:ubuntu-pi-flavour-makers/ppa
+        apt-get update
+
+        # Python
+        apt-get -y install python-minimal python3-minimal
+        apt-get -y install python-dev python3-dev
+        apt-get -y install python-pip python3-pip
+        apt-get -y install idle idle3
+
+        # Python extras a Raspberry Pi hacker expects to have available ;-)
+        apt-get -y install raspi-gpio
+        apt-get -y install python-rpi.gpio python3-rpi.gpio
+        apt-get -y install python-serial python3-serial
+        apt-get -y install python-spidev python3-spidev
+        apt-get -y install python-codebug-tether python3-codebug-tether
+        apt-get -y install python-codebug-i2c-tether python3-codebug-i2c-tether
+        apt-get -y install python-picamera python3-picamera
+        apt-get -y install python-rtimulib python3-rtimulib
+        apt-get -y install python-pil python3-pil
+        apt-get -y install python-pygame
+
+        # Python Sense Hat
+        wget -c "${SENSEHAT2}" -O /tmp/sensehat2.deb
+        gdebi -n /tmp/sensehat2.deb
+        wget -c "${SENSEHAT3}" -O /tmp/sensehat3.deb
+        gdebi -n /tmp/sensehat3.deb
+
+        # Astro Pi
+        wget -c "${ASTROPI2}" -O /tmp/astropi2.deb
+        gdebi -n /tmp/astropi2.deb
+        wget -c "${ASTROPI3}" -O /tmp/astropi3.deb
+        gdebi -n /tmp/astropi3.deb
+	fi
+
+    if [ "${FLAVOUR}" == "ubuntu-mate" ]; then
+        # Install the Minecraft PPA
+        apt-add-repository -y ppa:flexiondotorg/minecraft
+        apt-get update
+
+        # tboplayer
+        apt-get -y install ffmpeg youtube-dl youtube-dlg
+        apt-get -y install python-pexpect python3-pexpect
+        apt-get -y install python-ptyprocess python3-ptyprocess
+        apt-get -y install python-gobject-2 python-gobject
+        apt-get -y install python-tk python3-tk
+        wget -c "${TBOPLAYER_URL}/tboplayer.py" -O $R/usr/local/bin/tboplayer.py
+        wget -c "${TBOPLAYER_URL}/yt-dl_supported_sites" -O $R/usr/local/bin/yt-dl_supported_sites
+
+        # Create a sane default tboplayer configuration
+        mkdir -p $R/etc/skel/.tboplayer
+        cat <<EOM >$R/etc/skel/.tboplayer/tboplayer.cfg
+[config]
+audio = hdmi
+subtitles = off
+mode = single
+playlists =
+tracks =
+omx_options = -b
+debug = off
+track_info =
+youtube_media_format = mp4
+omx_location = /usr/bin/omxplayer
+ytdl_location = /usr/bin/youtube-dl
+ytdl_prefered_transcoder = ffmpeg
+download_media_url_upon = play
+geometry =
+EOM
+
+        # Create the executable
+        cat <<EOM >$R/usr/local/bin/tboplayer
+#!/bin/bash
+python2 /usr/local/bin/tboplayer.py
+EOM
+        chmod +x $R/usr/local/bin/tboplayer
+
+        # Create the .desktop entry.
+        cat <<EOM >$R/usr/share/applications/tboplayer.desktop
+[Desktop Entry]
+Version=1.0
+Name=GUI for OMXPlayer
+GenericName=Media player
+Comment=Play your multimedia streams
+Exec=tboplayer
+Icon=totem
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;
+MimeType=video/dv;video/mpeg;video/x-mpeg;video/msvideo;video/quicktime;video/x-anim;video/x-avi;video/x-ms-asf;video/x-ms-wmv;video/x-msvideo;video/x-nsv;video/x-flc;video/x-fli;video/x-flv;video/vnd.rn-realvideo;video/mp4;video/mp4v-es;video/mp2t;application/ogg;application/x-ogg;video/x-ogm+ogg;audio/x-vorbis+ogg;audio/ogg;video/ogg;application/x-matroska;audio/x-matroska;video/x-matroska;video/webm;audio/webm;audio/x-mp3;audio/x-mpeg;audio/mpeg;audio/x-wav;audio/x-mpegurl;audio/x-scpls;audio/x-m4a;audio/x-ms-asf;audio/x-ms-asx;audio/x-ms-wax;application/vnd.rn-realmedia;audio/x-real-audio;audio/x-pn-realaudio;application/x-flac;audio/x-flac;application/x-shockwave-flash;misc/ultravox;audio/vnd.rn-realaudio;audio/x-pn-aiff;audio/x-pn-au;audio/x-pn-wav;audio/x-pn-windows-acm;image/vnd.rn-realpix;audio/x-pn-realaudio-plugin;application/x-extension-mp4;audio/mp4;audio/amr;audio/amr-wb;x-content/audio-player;application/xspf+xml;x-scheme-handler/mms;x-scheme-handler/rtmp;x-scheme-handler/rtsp;
+Keywords=Player;Audio;Video;
+EOM
+
+        # nodered
+        wget -c "${NODERED}" -O $R/tmp/nodered.deb
+        gdebi -n /tmp/nodered.deb
+
+        # Scratch (nuscratch)
+        # - Requires: scratch wiringpi
+        wget -c "${WIRINGPI}" -O $R/tmp/wiringpi.deb
+        gdebi -n /tmp/wiringpi.deb
+        wget -c "${SCRATCH}" -O $R/tmp/scratch.deb
+        gdebi -n /tmp/scratch.deb
+        apt-get -y install nuscratch
+        rm -f $R/usr/share/applications/squeak.desktop || true
+        cat <<EOM >$R/etc/sudoers.d/scratch
+# Allow members of group gpio to execute scratch and sqweak
+%gpio ALL=NOPASSWD: /usr/bin/scratch
+%gpio ALL=NOPASSWD: /usr/bin/squeak
+EOM
+
+        # Minecraft
+        apt-get -y install minecraft-pi
+
+        # Sonic Pi
+        apt-get -y install sonic-pi
+
+        # raspi-config - Needs forking/modifying to support Ubuntu
+        #apt-get -y install raspi-config rc-ui
+    fi
+}
+
+configure_hardware
+install_software
+
+

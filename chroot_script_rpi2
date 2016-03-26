@@ -94,10 +94,10 @@ ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0003", SUBSYSTEMS=="usb", ACTION=="a
 EOF
 
     # copies-and-fills
-    wget -c "${COFI}" -O /tmp/cofi.deb
-    gdebi -n /tmp/cofi.deb
+    wget -c "${COFI}" -O /cofi.deb
+    #gdebi -n /tmp/cofi.deb
     # Disabled cofi so it doesn't segfault when building via qemu-user-static
-    mv -v /etc/ld.so.preload /etc/ld.so.preload.disable
+    #mv -v /etc/ld.so.preload /etc/ld.so.preload.disable
 
     # Set up fstab
     cat <<EOM > /etc/fstab
@@ -284,5 +284,6 @@ EOM
 
 configure_hardware
 install_software
+apt-get clean
 
 

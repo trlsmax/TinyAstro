@@ -62,7 +62,7 @@ _boot_on_ext4=""
 # SD Card partitions sizes in MB (1024 * 1024 bytes)  *
 # *****************************************************
 fatsize=64
-linuxsize=2560
+linuxsize=3072
 
 # *****************************************************
 # Set file systems uuid's for boot and fstab
@@ -85,7 +85,8 @@ _compress="no"
 #distro="precise"
 #distro="trusty"
 #distro="utopic"
-distro="vivid"
+#distro="vivid"
+distro="wily"
 repo="http://ports.ubuntu.com/ubuntu-ports"
 
 # ******************************************************
@@ -123,7 +124,7 @@ if [ ! "${image_name}" = "" ]; then
 	    sdcard="$image_name-$distro-$BOARD.img"
 	fi
 	odir="linux-$image_name-$distro-$BOARD"
-	bootdir="$odir/boot/firmware"
+	bootdir="$odir/boot"
 	# ========================================
     fi
 else
@@ -443,9 +444,6 @@ chmod +x $odir/fs_resize
 
 # make necessary directories and copy some files
 mkdir -p $odir/etc/default > /dev/null 2>&1
-if [ ! "${_boot_on_ext4}" = "yes" ] ; then
-    mkdir -p $odir/boot/firmware
-fi
 mkdir -p $odir/usr/local/bin
 
 
@@ -464,7 +462,7 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet static
-address 192.168.1.254
+address 192.168.1.250
 netmask 255.255.255.0
 gateway 192.168.1.1
 
@@ -542,6 +540,8 @@ if [ -f /first_boot ] ; then
 	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap_rtl8192cu.conf
+	dpkg -i /cofi.deb
+	rm -f /cofi.deb
 	rm -f /first_boot
     var=\$(bash /fs_resize)
     rm /fs_resize
@@ -654,19 +654,19 @@ echo ""
 # ***************
 # Create fstab
 # ***************
-echo "Creating \"fstab\""
-echo "# Odroid fstab" > $odir/etc/fstab
-echo "" >> $odir/etc/fstab
-if [ "${_format}" = "btrfs" ] ; then
-    echo "UUID=$ext4uuid  /  btrfs  noatime,nodiratime,compress=lzo  0 1" >> $odir/etc/fstab
-else
-#    echo "#UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime,data=writeback  0 1" >> $odir/etc/fstab
-    echo "UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime  0 1" >> $odir/etc/fstab
-fi
-if [ ! "${_boot_on_ext4}" = "yes" ] ; then
-    echo "/dev/mmcblk0p1  /boot/firmware  vfat  defaults,rw,owner,flush,umask=000  0 0" >> $odir/etc/fstab
-fi
-echo "tmpfs /tmp  tmpfs nodev,nosuid,mode=1777  0 0" >> $odir/etc/fstab
+#echo "Creating \"fstab\""
+#echo "# Odroid fstab" > $odir/etc/fstab
+#echo "" >> $odir/etc/fstab
+#if [ "${_format}" = "btrfs" ] ; then
+#    echo "UUID=$ext4uuid  /  btrfs  noatime,nodiratime,compress=lzo  0 1" >> $odir/etc/fstab
+#else
+##    echo "#UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime,data=writeback  0 1" >> $odir/etc/fstab
+#    echo "UUID=$ext4uuid  /  ext4  errors=remount-ro,noatime,nodiratime  0 1" >> $odir/etc/fstab
+#fi
+#if [ ! "${_boot_on_ext4}" = "yes" ] ; then
+#    echo "/dev/mmcblk0p1  /boot/firmware  vfat  defaults,rw,owner,flush,umask=000  0 0" >> $odir/etc/fstab
+#fi
+#echo "tmpfs /tmp  tmpfs nodev,nosuid,mode=1777  0 0" >> $odir/etc/fstab
 
 # IF CREATING IMAGE unmount and create final image
 if [ ! "${sdcard}" = "" ]; then

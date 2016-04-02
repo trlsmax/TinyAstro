@@ -24,7 +24,7 @@ cd $_DIR
 # =====================================================
 
 # ========= size of the system.img ========
-image_size=2048
+image_size=3072
 
 # ========= image name ==================
 image_name=system.img
@@ -73,6 +73,10 @@ cp ./rk/cfg/modules $image_tmp/etc/
 cp ./rk/cfg/rc.local $image_tmp/etc/
 cp ./rk/cfg/fstab $image_tmp/etc/
 cp ./rk/modules.tar.bz2 $image_tmp
+cp ./rk/brcm_patchram_plus $image_tmp/home/astro/tools/
+chmod +x $image_tmp/home/astro/tools/brcm_patchram_plus
+cp ./rk/bluetooth.sh $image_tmp/home/astro/tools/
+chmod +x $image_tmp/home/astro/tools/bluetooth.sh
 
 cp chroot_script_rk $image_tmp/bin/
 chroot $image_tmp /bin/bash /bin/chroot_script_rk
@@ -86,8 +90,8 @@ echo "start to build the image"
 
 rm -f ./tmp.img ./update.img ./tinyastro_rk3188.tar.xz
 ./rk/afptool -pack ./rk/img ./tmp.img
-./rk/img_maker ./rk/img/RK3188Loader\(L\)_V2.10.bin ./tmp.img ./update.img
+./rk/img_maker ./rk/img/RK3188Loader\(L\)_V2.19.bin ./tmp.img ./update.img
 
 rm -rf $image_tmp ./tmp.img ./rk/img/system.img
-tar cJvf ./tinyastro_rk3188.tar.xz ./update.img ./README ./rk/RKBatchTool-v1.8.rar ./rk/upgrade_tool
-rm -f ./update.img
+#tar cJvf ./tinyastro_rk3188.tar.xz ./update.img ./README ./rk/RKBatchTool-v1.8.rar ./rk/upgrade_tool
+#rm -f ./update.img

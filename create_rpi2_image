@@ -537,7 +537,7 @@ cat > $odir/etc/rc.local << _EOF_
 # By default this script does nothing.
 
 if [ -f /first_boot ] ; then
-	RAND_NAME=\$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+	RAND_NAME=\$(openssl rand -base64 8)
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap.conf
 	echo "ssid=TinyAstro_\$RAND_NAME" >> /etc/hostapd/ap_rtl8192cu.conf
 	dpkg -i /cofi.deb
@@ -703,8 +703,8 @@ if [ ! "${sdcard}" = "" ]; then
     fi
 
     rm -f ./${sdcard}1 ./${sdcard}2 ./${sdcard}u
-    tar cJvf ./tinyastro_${BOARD}.tar.xz ./${sdcard} ./README
-    rm -f ./${sdcard}
+    #tar cJvf ./tinyastro_${BOARD}.tar.xz ./${sdcard} ./README
+    #rm -f ./${sdcard}
 fi
 
 if [ "${_directsd}" = "yes" ] ; then

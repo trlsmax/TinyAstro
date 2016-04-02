@@ -32,9 +32,9 @@ cd $_DIR
 distro="wily"
 #repo="http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/"
 #repo="http://ftp.ubuntu-tw.org/mirror/ubuntu-ports/"
-#repo="http://mirrors.ustc.edu.cn/ubuntu-ports"
+repo="http://mirrors.ustc.edu.cn/ubuntu-ports"
 #repo="http://mirrors.ustc.edu.cn/ubuntu"
-repo="http://ports.ubuntu.com/ubuntu-ports"
+#repo="http://ports.ubuntu.com/ubuntu-ports"
 
 # === Debian ===
 #distro="wheezy"
@@ -113,12 +113,10 @@ debootstrap --arch $arch --foreign --verbose --variant=minbase --include=wget $d
 # ** CREATE NEW sources.list:
 # ***************************
 echo "Creating \"sources.list\""
-case ${distro} in trusty|utopic|precise|vivid|wily)
+case ${distro} in trusty|utopic|precise|vivid|wily|xenial)
 cat > $odir/sources.list << _EOF_
 deb $repo/ $distro main restricted universe multiverse
-deb-src $repo/ $distro main restricted universe multiverse
 deb $repo/ $distro-updates main restricted universe multiverse
-deb-src $repo/ $distro-updates main restricted universe multiverse
 deb $repo/ $distro-security main restricted universe multiverse
 deb $repo/ $distro-backports main restricted universe multiverse
 _EOF_
@@ -146,6 +144,8 @@ mkdir -p $odir/usr/local/bin
 
 cp /etc/timezone $odir/etc
 cp /usr/bin/qemu-arm-static $odir/usr/bin
+cp ./common/timeset $odir/usr/bin
+chmod +x $odir/usr/bin/timeset
 cp second-stage $odir/second-stage
 #cp wallpaper.png $odir/ #> /dev/null 2>&1
 
@@ -191,6 +191,7 @@ cp ./common/cfg/sudoers $odir/etc/
 cp -rf ./common/cfg/DarkCold4 $odir/usr/share/themes/
 cp ./common/cfg/xorg.dummy.conf $odir/etc/X11/
 cp ./common/cfg/Xwrapper.config $odir/etc/X11/
+cp ./common/cfg/40-libgphoto2-6.rules $odir/etc/udev/rules.d/
 cp ./common/kstars_chn/*.mo $odir/usr/share/locale/zh_CN/LC_MESSAGES/
 
 #echo "Copy astrometry.net index ..."

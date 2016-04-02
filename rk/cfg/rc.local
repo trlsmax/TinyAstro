@@ -51,5 +51,6 @@ fi
 su astro -c "startx -- :1 -config xorg.dummy.conf " &
 su astro -c "x11vnc -display :1 -forever" &
 /home/astro/tools/ddserver &
+nohup /home/astro/tools/bluetooth.sh &>/dev/null &
 
 exit 0

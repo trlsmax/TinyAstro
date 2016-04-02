@@ -1,7 +1,7 @@
 # NAME		Relative path
 #
 package-file	package-file
-bootloader	RK3188Loader(L)_V2.10.bin
+bootloader	RK3188Loader(L)_V2.19.bin
 parameter		parameter
 misc		misc.img
 kernel				kernel.img

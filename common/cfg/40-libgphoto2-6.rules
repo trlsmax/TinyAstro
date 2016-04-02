@@ -1,0 +1,7 @@
+# udev rules for PTP camera
+# plug your camera and turn it on
+# run lsusb to get pid/vid
+#
+ATTRS{idVendor}=="04a9", ENV{ID_GPHOTO2}="1", ENV{GPHOTO2_DRIVER}="proprietary", MODE="0664", GROUP="plugdev"
+ATTRS{idVendor}=="04b0", ENV{ID_GPHOTO2}="1", ENV{GPHOTO2_DRIVER}="proprietary", MODE="0664", GROUP="plugdev"
+ATTRS{idVendor}=="054c", ENV{ID_GPHOTO2}="1", ENV{GPHOTO2_DRIVER}="proprietary", MODE="0664", GROUP="plugdev"

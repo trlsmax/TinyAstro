@@ -28,3 +28,6 @@ stop on runlevel [!12345]
 respawn
 exec /sbin/getty -L 115200 console vt102
 _EOF_
+
+apt-get install -y upstart-sysv rfkill blueman
+apt-get clean

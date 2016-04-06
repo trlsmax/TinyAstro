@@ -573,6 +573,12 @@ su astro -c "x11vnc -display :1 -forever &"
 exit 0
 _EOF_
 
+
+cat >> $odir/lib/systemd/system/rc-local.service << _EOF_
+[Install]
+WantedBy=multi-user.target
+_EOF_
+
 # *****************************
 # Setup tmux to show the cursor
 cat > $odir/home/$USER/.tmux.conf << _EOF_
@@ -703,8 +709,8 @@ if [ ! "${sdcard}" = "" ]; then
     fi
 
     rm -f ./${sdcard}1 ./${sdcard}2 ./${sdcard}u
-    #tar cJvf ./tinyastro_${BOARD}.tar.xz ./${sdcard} ./README
-    #rm -f ./${sdcard}
+    tar cJvf ./tinyastro_${BOARD}.tar.xz ./${sdcard} ./README
+    rm -f ./${sdcard}
 fi
 
 if [ "${_directsd}" = "yes" ] ; then

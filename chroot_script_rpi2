@@ -285,5 +285,6 @@ EOM
 configure_hardware
 install_software
 apt-get clean
+systemctl enable rc-local.service
 
 

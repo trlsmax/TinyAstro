@@ -32,9 +32,9 @@ cd $_DIR
 distro="wily"
 #repo="http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/"
 #repo="http://ftp.ubuntu-tw.org/mirror/ubuntu-ports/"
-repo="http://mirrors.ustc.edu.cn/ubuntu-ports"
+#repo="http://mirrors.ustc.edu.cn/ubuntu-ports"
 #repo="http://mirrors.ustc.edu.cn/ubuntu"
-#repo="http://ports.ubuntu.com/ubuntu-ports"
+repo="http://ports.ubuntu.com/ubuntu-ports"
 
 # === Debian ===
 #distro="wheezy"

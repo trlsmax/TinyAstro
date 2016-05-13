@@ -1,3 +1,16 @@
+2016-04-25 Lin_guider 3.3.0 (c)Galaxy Master <galaxy_master@mail.ru>
+
+	* Add pulse driver for SkyWatcher/Orion mounts (HC firmware at least 3.38.08 or 4.38.08 is required), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add colour support for Atik Cameras, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Use latest Atik SDK (v.1.1), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Use latest ASI SDK (v.0.3.0324), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* UI tweaks, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+
+2016-03-18 Lin_guider 3.2.2 (c)Galaxy Master <galaxy_master@mail.ru>
+
+	* Use latest ASI SDK (v.0.3.0316), by Rumen G.Bogdanovski <rumen@skyarchive.org>
+	* Add SAVE_FRAME_DECORATED server command, by Rumen G.Bogdanovski <rumen@skyarchive.org>
+
 2015-11-25 Lin_guider 3.2.1 (c)Galaxy Master <galaxy_master@mail.ru>
 
 	* Use latest Atik SDK (0.41), by Rumen G.Bogdanovski <rumen@skyarchive.org>

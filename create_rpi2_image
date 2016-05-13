@@ -634,7 +634,7 @@ _EOF_
 #rm $odir/etc/init/tty5.conf
 #rm $odir/etc/init/tty6.conf
 #
-#}
+}
 
 set_network
 do_tricks

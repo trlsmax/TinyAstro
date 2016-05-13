@@ -6,7 +6,7 @@ PHD2, TinyAstro will support a large rang of hardware.
     1.RK3188 with internal AP6210 or USB wifi with rtl8192cu chip, .
     2.Odroid C1 with USB WIFI rtl8192cu chip as AP
     3.Odroid U3 with USB WIFI rtl8192cu chip as AP
-    4.Raspberry Pi 2 with USB WIFI rtl8192cu chip as AP
+    4.Raspberry Pi 2/3 with USB WIFI rtl8192cu chip as AP
 
 Installation
 For RK3188 internal NAND FLASH:
@@ -28,7 +28,7 @@ Windows:
       the patipation.
     7.if you can find a wifi access point named like this TinyAstro_XXXXXX, instal done.
 
-For Odroid C1/U3 and Raspberry Pi 2 SD card:
+For Odroid C1/U3 and Raspberry Pi 2/3 SD card:
 Linux:
     1.Connect your SD card to your PC with card reader
     2.Find SD card device name with command "sudo fdisk -l", for example, /dev/sdb
@@ -44,8 +44,12 @@ Windows:
 
 Usage:
     1.connect to wifi access point TinyAstro_XXXXXX with password:astronomy
-    2.use vnc client to connect 10.0.0.1 at port 5901 with password:astronomy
-    3.start the setting program from desktop and set time to the real time.
+    3.use vnc client to connect 10.0.0.1 at port 5900
+    3.open a terminal and input command "sudo dpkg-reconfigure tzdata" with
+    password:astronomy to config timezone
+    4.access http://10.0.0.1 from web broswer to sync time
+    5.start all the software you need to control your gear
+    6.enjoy
 
 TinyAstro website:
     http://github.com/trlsmax/tinyastro
@@ -54,48 +58,4 @@ Author:
     Max Chen
     trlsmax@gmail.com
 
-Change log:
-    2015.08.01:fix fstab error
-               add openssh-sftp-server
-               fix kstars can't add custom location
-               change defualt wlan0 to ap6210 on RK3188 platform
-    2015.07.23:update system to ubuntu vivid
-               update to latest kstars, phd2, Lin_guider
-               support more hardware
-    2015.03.04:update libindi to latest svn version
-               add indi_ioptron_8407plus from zhihui
-               update lin_guider to 3.0.0 to get ASI support
-    2015.02.26:update libindi to latest svn sersion
-               add libindi dev pkgs
-    2015.01.06:add offical indi_qhy_ccd by Lzr from QHY, should support most QHY CCD
-               add QHY5LIIM driver to PHD2 and update to latest version
-               update OpenSkyImager latest version
-    2014.11.26:update PHD2 to v2.4.0 with more stable ASI cameras support
-               update INDI to latest svn version
-    2014.09.19:update bootloader and nand flash kernel driver
-               fix bug in setting tools that fail to set AP ESSID and password
-               update INDI to 0.9.9
-               update lin_guider to 2.11 with ATIK camera guiding support
-               add IOPtron 8407+ handle driver by Dobe
-               add QHY INDI driver by Lzr from QHY
-               add Pentax camera control software PKTriggerCord
-               update PHD2 with new driver for ASI camera	
-               update OSI with SBIG support and dither support with lin_guider
-               some other bug fixed
-    2014.08.13:change to a more stable kernel
-			   fix connection error of fli camera
-			   change web interface, just access http://10.0.0.1 to sync time or upload files or reboot TinyAstro
-			   cook skysafari setting after solve-field, use sftp client to download from /home/astro/tools/www/TinyAstro.skyset
-			   add hardinfo to display system info
-			   add fsck
-    2014.07.16:fix nikon dslr didn't work
-			   fix mount control driver of indi crash when connect mount.
-			   add web access update TinyAstro system time, just access http://10.0.0.1/time.html
-			   add basic Skysafari support
-    2014.06.29:rebuild rootfs and reduce the size,
-               fix ccd software can't work
-               if internal wifi can't work, a external rtl8192cu usb wifi can be use as ap
-               add gdb for debug
-    2014.06.27:add ccd 1.2.9 from galaxymstr, fix usb serial permission issue
-    2014.05.29:update kernel to 3.0.101+ and get faster cpu rate
-    2014.05.24:first working image.
+

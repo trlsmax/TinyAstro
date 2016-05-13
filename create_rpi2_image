@@ -549,17 +549,29 @@ if [ -f /first_boot ] ; then
 fi
 
 rtl8192cu=""
+brcmwifi=""
 for wlan in \$(ls /sys/class/net | grep wlan)
 do
     tmp=\$(ethtool -i \$wlan | head -n 1 | awk '{print \$2}')
     if [ "\$tmp" = "rtl8192cu" ]; then
         rtl8192cu=\$wlan
-        break;
+    elif [ "\$tmp" = "brcmfmac" ]; then
+        brcmwifi=\$wlan
     fi
 done
 
-if [ ! -z "\$rtl8192cu" ]; then
+if [ ! -z "\$brcmwifi" ]; then
+    ifdown \$brcmwifi
+    sed -i 's/wlan[0-9]/'\$brcmwifi'/' /etc/network/interfaces
+    ifup \$brcmwifi
+    sed -i 's/^\(interface=\).*/\1'\$brcmwifi'/' /etc/hostapd/ap.conf
+    hostapd -B /etc/hostapd/ap.conf & > /dev/null 2>&1
+    sed -i 's/^\(interface=\).*/\1'\$brcmwifi'/' /etc/dnsmasq.conf
+    service dnsmasq restart
+elif [ ! -z "\$rtl8192cu" ]; then
+    ifdown \$rtl8192cu
     sed -i 's/wlan[0-9]/'\$rtl8192cu'/' /etc/network/interfaces
+    ifup \$rtl8192cu
     sed -i 's/^\(interface=\).*/\1'\$rtl8192cu'/' /etc/hostapd/ap_rtl8192cu.conf
     hostapd_rtl -B /etc/hostapd/ap_rtl8192cu.conf & > /dev/null 2>&1
     sed -i 's/^\(interface=\).*/\1'\$rtl8192cu'/' /etc/dnsmasq.conf
@@ -569,6 +581,9 @@ fi
 su astro -c "startx -- :1 -config xorg.dummy.conf &"
 su astro -c "x11vnc -display :1 -forever &"
 /home/astro/tools/ddserver &
+
+hciattach /dev/ttyAMA0 bcm43xx 921600 noflow -
+hciattach /dev/ttyAMA0 bcm43xx 921600 noflow -
 
 exit 0
 _EOF_
@@ -602,24 +617,24 @@ _EOF_
 
 # *********************************************
 # Enable serial console and 3 virtual terminals
-cat > $odir/etc/init/ttyAMA0.conf << _EOF_
-# ttyAMA0 - getty
+#cat > $odir/etc/init/ttyAMA0.conf << _EOF_
+## ttyAMA0 - getty
+##
+## This service maintains a getty on ttyS0 from the point the system is
+## started until it is shut down again.
 #
-# This service maintains a getty on ttyS0 from the point the system is
-# started until it is shut down again.
-
-start on stopped rc or RUNLEVEL=[12345]
-stop on runlevel [!12345]
-
-respawn
-exec /sbin/getty -L 115200 ttyAMA0 vt102
-_EOF_
-
-rm $odir/etc/init/tty4.conf
-rm $odir/etc/init/tty5.conf
-rm $odir/etc/init/tty6.conf
-
-}
+#start on stopped rc or RUNLEVEL=[12345]
+#stop on runlevel [!12345]
+#
+#respawn
+#exec /sbin/getty -L 115200 ttyAMA0 vt102
+#_EOF_
+#
+#rm $odir/etc/init/tty4.conf
+#rm $odir/etc/init/tty5.conf
+#rm $odir/etc/init/tty6.conf
+#
+#}
 
 set_network
 do_tricks
@@ -645,6 +660,11 @@ cp ./chroot_script_rpi2 $odir/chroot_script_rpi2
 chroot $odir /bin/bash /chroot_script_rpi2
 umount_system
 rm $odir/chroot_script_rpi2
+
+#copy firmware
+cp ./rpi/brcmfmac43430-sdio.* $odir/lib/firmware/brcm/
+mkdir -p $odir/etc/firmware
+cp ./rpi/BCM43430A1.hcd $odir/etc/firmware/
 
 sync
 
